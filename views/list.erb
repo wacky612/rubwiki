@@ -1,0 +1,10 @@
+%ul
+  <% @list.each do |hash| %>
+  %li<
+    <% if hash[:type] == :tree %>
+    %a(href="<%= hash[:name] %>/")< <%= hash[:name] %>/
+    <% else %>
+    <% filename = File.basename(hash[:name], ".md") %>
+    %a(href="<%= filename %>")< <%= filename %>
+    <% end %>
+  <% end %>
