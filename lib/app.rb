@@ -71,7 +71,7 @@ module RubWiki
       if sha1 == sha2
         settings.wiki.write("#{path}.md", new_raw_data)
         settings.wiki.commit(remote_user(), "#{remote_user()}@kmc.gr.jp", commit_message)
-        redirect URI.encode("/#{path}") # passenger にのせた時に変更する必要あり
+        redirect to(URI.encode("/#{path}"))
       else
         return "conflict"
       end
