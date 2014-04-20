@@ -4,6 +4,7 @@ require 'erb'
 require 'nkf'
 require 'haml'
 require 'kramdown'
+require 'mime-types'
 
 require 'sinatra/base'
 require 'sinatra/reloader'
@@ -61,6 +62,7 @@ module RubWiki
         return haml(:page)
       else
         halt unless wiki.exist?(path)
+        content_type MIME::Types.type_for(path)[0].to_s
         return wiki.read(path)
       end
     end

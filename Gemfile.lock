@@ -5,6 +5,7 @@ GEM
     haml (4.0.5)
       tilt
     kramdown (1.3.3)
+    mime-types (2.2)
     multi_json (1.9.2)
     rack (1.5.2)
     rack-protection (1.5.3)
@@ -31,6 +32,7 @@ PLATFORMS
 DEPENDENCIES
   haml
   kramdown
+  mime-types
   rugged
   sinatra
   sinatra-contrib
