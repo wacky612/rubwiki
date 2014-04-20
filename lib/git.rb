@@ -27,7 +27,11 @@ module RubWiki
     end
 
     def read(path)
-      obj = @repo.lookup(get_oid(path))
+      return read_from_oid(get_oid(path))
+    end
+
+    def read_from_oid(oid)
+      obj = @repo.lookup(oid)
 
       if obj.instance_of?(Rugged::Blob)
         return obj.text

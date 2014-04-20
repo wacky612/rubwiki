@@ -2,7 +2,7 @@
   <% @commits.each do |hash| %>
   %li<
     <%= hash[:time].strftime("%y/%m/%d %T") %> <%= hash[:author] %>
-    %a{ :href => "<%= hash[:oid] %>" }<
+    %a{ :href => "revision/<%= hash[:oid] %>" }<
       :escaped
         <%= hash[:message] %>
   <% end %>

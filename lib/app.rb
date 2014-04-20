@@ -36,6 +36,15 @@ module RubWiki
       return haml(:page)
     end
 
+    get '/*/revision/*' do
+      wiki = Git.new(settings.git_repo_path)
+      path = params[:splat].first
+      revision = params[:splat].last
+      raw_data = wiki.read_from_oid(revision)
+      @contents = markdown(raw_data)
+      return haml(:page)
+    end
+
     get '/*/edit' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
