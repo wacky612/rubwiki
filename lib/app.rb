@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'uri'
 require 'erb'
+require 'nkf'
 require 'haml'
 require 'kramdown'
 
@@ -69,7 +70,7 @@ module RubWiki
       sha2 = settings.wiki.sha("#{path}.md")
 
       if sha1 == sha2
-        settings.wiki.write("#{path}.md", new_raw_data)
+        settings.wiki.write("#{path}.md", NKF.nkf("-Luw", new_raw_data))
         settings.wiki.commit(remote_user(), "#{remote_user()}@kmc.gr.jp", commit_message)
         redirect to(URI.encode("/#{path}"))
       else
