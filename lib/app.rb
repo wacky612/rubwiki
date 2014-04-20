@@ -28,6 +28,14 @@ module RubWiki
       return haml(:page)
     end
 
+    get '/*/history' do
+      wiki = Git.new(settings.git_repo_path)
+      path = params[:splat].first
+      @commits = wiki.history("#{path}.md")
+      @contents = haml(erb(:history))
+      return haml(:page)
+    end
+
     get '/*/edit' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first

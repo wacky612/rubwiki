@@ -61,6 +61,24 @@ module RubWiki
       end
     end
 
+    def history(path)
+      walker = Rugged::Walker.new(@repo)
+      walker.sorting(Rugged::SORT_DATE)
+      walker.push(@repo.head.target)
+      commits = []
+      walker.each do |commit|
+        if commit.parents.size >= 1 && commit.diff(paths: [path]).size > 0
+          _commit = {}
+          _commit[:author] = commit.author[:name]
+          _commit[:message] = commit.message
+          _commit[:time] = commit.time
+          _commit[:oid] = get_oid(path, commit.tree.oid)
+          commits << _commit
+        end
+      end
+      return commits
+    end
+
     def write(path, data)
       blob_oid = @repo.write(data, :blob)
       @tree_oid = update_tree(@tree_oid, path, blob_oid)
@@ -92,9 +110,9 @@ module RubWiki
       return builder.write(@repo)
     end
 
-    def get_oid(path)
+    def get_oid(path, tree_oid = nil)
       path = path.split("/")
-      oid = @tree_oid
+      oid = tree_oid || @tree_oid
 
       path.each do |name|
         obj = @repo.lookup(oid)

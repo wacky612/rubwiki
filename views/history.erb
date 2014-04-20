@@ -1,0 +1,8 @@
+%ul
+  <% @commits.each do |hash| %>
+  %li<
+    <%= hash[:time].strftime("%y/%m/%d %T") %> <%= hash[:author] %>
+    %a{ :href => "<%= hash[:oid] %>" }<
+      :escaped
+        <%= hash[:message] %>
+  <% end %>
