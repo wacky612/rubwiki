@@ -31,7 +31,8 @@ module RubWiki
     get '/*/history' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
-      @commits = wiki.history("#{path}.md")
+      path = "#{path}.md" if File.extname(path).empty?
+      @commits = wiki.history(path)
       @contents = haml(erb(:history))
       return haml(:page)
     end
