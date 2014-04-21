@@ -55,6 +55,16 @@ module RubWiki
       end
     end
 
+    get '/*/diff/*/*' do
+      wiki = Git.new(settings.git_repo_path)
+      path = params[:splat].first
+      oid1 = params[:splat][1]
+      oid2 = params[:splat][2]
+      @diff = wiki.diff(oid1, oid2)
+      @contents = haml(erb(:diff))
+      return haml(:page)
+    end
+
     get '/*/edit' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first

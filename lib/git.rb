@@ -83,6 +83,12 @@ module RubWiki
       return commits
     end
 
+    def diff(oid1, oid2)
+      blob1 = @repo.lookup(oid1)
+      blob2 = @repo.lookup(oid2)
+      return blob1.diff(blob2)
+    end
+
     def write(path, data)
       blob_oid = @repo.write(data, :blob)
       @tree_oid = update_tree(@tree_oid, path, blob_oid)

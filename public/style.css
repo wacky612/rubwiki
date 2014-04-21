@@ -1,0 +1,11 @@
+code.diff_header {
+  color: purple;
+}
+
+code.diff_addition {
+  color: green;
+}
+
+code.diff_deletion {
+  color: red;
+}

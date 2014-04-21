@@ -1,0 +1,13 @@
+%pre
+  <% @diff.each_hunk do |hunk| %>
+  %code.diff_header &nbsp;&nbsp;<%= hunk.header %>
+  <% hunk.each_line do |line|%>
+  <% if line.addition? %>
+  %code.diff_addition +&nbsp;<%= line.content %>
+  <% elsif line.deletion? %>
+  %code.diff_deletion -&nbsp;<%= line.content %>
+  <% else %>
+  %code &nbsp;&nbsp;<%= line.content %>
+  <% end %>
+  <% end %>
+  <% end %>
