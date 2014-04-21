@@ -42,8 +42,17 @@ module RubWiki
       path = params[:splat].first
       revision = params[:splat].last
       raw_data = wiki.read_from_oid(revision)
-      @contents = markdown(raw_data)
-      return haml(:page)
+      if File.extname(path).empty?
+        @contents = markdown(raw_data)
+        return haml(:page)
+      else
+        begin
+          content_type MIME::Types.type_for(path)[0].to_s
+        rescue
+          content_type "text/plain"
+        end
+        return raw_data
+      end
     end
 
     get '/*/edit' do
