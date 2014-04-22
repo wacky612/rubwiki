@@ -117,7 +117,28 @@ module RubWiki
         wiki.commit(remote_user(), "#{remote_user()}@kmc.gr.jp", commit_message)
         redirect to(URI.encode("/#{path}"))
       else
-        return "conflict"
+        old_raw_data = wiki.read_from_oid(sha1)
+        raw_data_from_git = wiki.read("#{path}.md")
+        raw_data_from_web = NKF.nkf("-Luw", new_raw_data)
+        Dir.chdir("/tmp") do
+          File.write("web", raw_data_from_web)
+          File.write("old", old_raw_data)
+          File.write(sha2, raw_data_from_git)
+          IO.popen("merge -p web old #{sha2}", "r", :encoding => Encoding::UTF_8) do |io|
+            @raw_data = io.read
+          end
+          File.delete("web")
+          File.delete("old")
+          File.delete(sha2)
+        end
+        if $? == 0
+          wiki.write("#{path}.md", @raw_data)
+          wiki.commit(remote_user(), "#{remote_user()}@kmc.gr.jp", commit_message)
+          redirect to(URI.encode("/#{path}"))
+        else
+          @contents = haml(:edit)
+          return haml(:page)
+        end
       end
     end
 
