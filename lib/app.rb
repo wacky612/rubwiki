@@ -70,10 +70,10 @@ module RubWiki
       path = params[:splat].first
       if wiki.exist?("#{path}.md")
         halt unless wiki.file?("#{path}.md")
-        @sha = wiki.sha("#{path}.md")
+        @oid = wiki.oid("#{path}.md")
         @raw_data = wiki.read("#{path}.md")
       else
-        @sha = ""
+        @oid = ""
         @raw_data = ""
       end
       @contents = haml(:edit)
@@ -109,27 +109,27 @@ module RubWiki
       path = params[:splat].first
       new_raw_data = params[:data]
       commit_message = params[:commit_message]
-      sha1 = params[:sha]
-      sha2 = wiki.sha("#{path}.md")
+      oid_from_web = params[:oid]
+      oid_from_git = wiki.oid("#{path}.md")
 
-      if sha1 == sha2
+      if oid_from_web == oid_from_git
         wiki.write("#{path}.md", NKF.nkf("-Luw", new_raw_data))
         wiki.commit(remote_user(), "#{remote_user()}@kmc.gr.jp", commit_message)
         redirect to(URI.encode("/#{path}"))
       else
-        old_raw_data = wiki.read_from_oid(sha1)
+        old_raw_data = wiki.read_from_oid(oid_from_web)
         raw_data_from_git = wiki.read("#{path}.md")
         raw_data_from_web = NKF.nkf("-Luw", new_raw_data)
         Dir.chdir("/tmp") do
           File.write("web", raw_data_from_web)
           File.write("old", old_raw_data)
-          File.write(sha2, raw_data_from_git)
-          IO.popen("merge -p web old #{sha2}", "r", :encoding => Encoding::UTF_8) do |io|
+          File.write(oid_from_git, raw_data_from_git)
+          IO.popen("merge -p web old #{oid_from_git}", "r", :encoding => Encoding::UTF_8) do |io|
             @raw_data = io.read
           end
           File.delete("web")
           File.delete("old")
-          File.delete(sha2)
+          File.delete(oid_from_git)
         end
         if $? == 0
           wiki.write("#{path}.md", @raw_data)
@@ -144,7 +144,7 @@ module RubWiki
 
     post '/*/preview' do
       @raw_data = params[:data]
-      @sha = params[:sha]
+      @oid = params[:oid]
       @contents = haml(:edit)
       @contents << markdown(@raw_data)
       return haml(:page)

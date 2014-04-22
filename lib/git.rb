@@ -54,7 +54,7 @@ module RubWiki
       end
     end
 
-    def sha(path)
+    def oid(path)
       oid = get_oid(path)
       obj = @repo.lookup(oid)
 
