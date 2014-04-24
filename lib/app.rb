@@ -29,7 +29,7 @@ module RubWiki
     get '/*/history' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
-      path = "#{path}.md" if File.extname(path).empty?
+      path = append_ext(path) if File.extname(path).empty?
       commits = wiki.history(path)
       return history(commits)
     end
@@ -59,10 +59,10 @@ module RubWiki
     get '/*/edit' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
-      if wiki.exist?("#{path}.md")
-        halt unless wiki.file?("#{path}.md")
-        oid = wiki.oid("#{path}.md")
-        raw_data = wiki.read("#{path}.md")
+      if wiki.exist?(append_ext(path))
+        halt unless wiki.file?(append_ext(path))
+        oid = wiki.oid(append_ext(path))
+        raw_data = wiki.read(append_ext(path))
       else
         oid = ""
         raw_data = ""
@@ -82,8 +82,8 @@ module RubWiki
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
       if File.extname(path).empty?
-        halt unless wiki.exist?("#{path}.md")
-        raw_data = wiki.read("#{path}.md")
+        halt unless wiki.exist?(append_ext(path))
+        raw_data = wiki.read(append_ext(path))
         return view(raw_data, path)
       else
         halt unless wiki.exist?(path)
@@ -98,18 +98,18 @@ module RubWiki
       raw_data_from_web = NKF.nkf("-Luw", params[:data])
       commit_message = params[:commit_message]
       oid_from_web = params[:oid]
-      oid_from_git = wiki.oid("#{path}.md")
+      oid_from_git = wiki.oid(append_ext(path))
 
       if oid_from_web == oid_from_git
-        wiki.write("#{path}.md", raw_data_from_web)
+        wiki.write(append_ext(path), raw_data_from_web)
         wiki.commit(remote_user(), remote_user_mail(), commit_message)
         redirect to(URI.encode("/#{path}"))
       else
         raw_data_old = wiki.read_from_oid(oid_from_web)
-        raw_data_from_git = wiki.read("#{path}.md")
+        raw_data_from_git = wiki.read(append_ext(path))
         raw_data_merged, is_success = merge(raw_data_from_web, raw_data_old, raw_data_from_git)
         if is_success
-          wiki.write("#{path}.md", raw_data_merged)
+          wiki.write(append_ext(path), raw_data_merged)
           wiki.commit(remote_user(), remote_user_mail(), commit_message)
           redirect to(URI.encode("/#{path}"))
         else
@@ -161,6 +161,10 @@ module RubWiki
         File.delete("git")
       end
       return raw_data_merged, ($? == 0)
+    end
+
+    def append_ext(path)
+      return "#{path}.md"
     end
 
     def diff(diff)
