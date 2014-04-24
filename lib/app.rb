@@ -42,11 +42,7 @@ module RubWiki
       if File.extname(path).empty?
         return revision(raw_data, path, revision)
       else
-        begin
-          content_type MIME::Types.type_for(path)[0].to_s
-        rescue
-          content_type "text/plain"
-        end
+        guess_mime(path)
         return raw_data
       end
     end
@@ -91,7 +87,7 @@ module RubWiki
         return view(raw_data, path)
       else
         halt unless wiki.exist?(path)
-        content_type MIME::Types.type_for(path)[0].to_s
+        guess_mime(path)
         return wiki.read(path)
       end
     end
@@ -146,6 +142,14 @@ module RubWiki
         return request.env['REMOTE_USER']
       else
         return "anonymous"
+      end
+    end
+
+    def guess_mime(path)
+      begin
+        content_type MIME::Types.type_for(path)[0].to_s
+      rescue
+        content_type "text/plain"
       end
     end
 
