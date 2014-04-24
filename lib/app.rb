@@ -107,19 +107,8 @@ module RubWiki
       else
         raw_data_old = wiki.read_from_oid(oid_from_web)
         raw_data_from_git = wiki.read("#{path}.md")
-        raw_data_merged = nil
-        Dir.chdir("/tmp") do
-          File.write("web", raw_data_from_web)
-          File.write("old", raw_data_old)
-          File.write(oid_from_git, raw_data_from_git)
-          IO.popen("merge -p web old #{oid_from_git}", "r", :encoding => Encoding::UTF_8) do |io|
-            raw_data_merged = io.read
-          end
-          File.delete("web")
-          File.delete("old")
-          File.delete(oid_from_git)
-        end
-        if $? == 0
+        raw_data_merged, is_success = merge(raw_data_from_web, raw_data_old, raw_data_from_git)
+        if is_success
           wiki.write("#{path}.md", raw_data_merged)
           wiki.commit(remote_user(), "#{remote_user()}@kmc.gr.jp", commit_message)
           redirect to(URI.encode("/#{path}"))
@@ -151,6 +140,22 @@ module RubWiki
       rescue
         content_type "text/plain"
       end
+    end
+
+    def merge(raw_data_from_web, raw_data_old, raw_data_from_git)
+      raw_data_merged = nil
+      Dir.chdir("/tmp") do
+        File.write("web", raw_data_from_web)
+        File.write("old", raw_data_old)
+        File.write("git", raw_data_from_git)
+        IO.popen("merge -p web old git", "r", :encoding => Encoding::UTF_8) do |io|
+          raw_data_merged = io.read
+        end
+        File.delete("web")
+        File.delete("old")
+        File.delete("git")
+      end
+      return raw_data_merged, ($? == 0)
     end
 
     def diff(diff)
