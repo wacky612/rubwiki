@@ -1,5 +1,5 @@
 %ul
-  - @list.each do |hash|
+  - list.each do |hash|
     %li<
       - if hash[:type] == :tree
         %a{ :href => "#{hash[:name]}/" }<

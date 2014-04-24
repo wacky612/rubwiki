@@ -2,8 +2,8 @@
   %li Top
   %li<
     %a{ :href => url("/") }< All
-  - if @path
+  - if path
     %li<
-      %a{ :href => url("/#{@path}/edit") }< Edit
+      %a{ :href => url("/#{path}/edit") }< Edit
     %li<
-      %a{ :href => url("/#{@path}/history") }< History
+      %a{ :href => url("/#{path}/history") }< History

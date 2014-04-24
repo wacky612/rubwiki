@@ -1,5 +1,5 @@
 %pre
-  - @diff.each_hunk do |hunk|
+  - diff.each_hunk do |hunk|
     %code.diff_header
       &nbsp;&nbsp;#{hunk.header}
     - hunk.each_line do |line|
