@@ -10,15 +10,22 @@ require 'sinatra/reloader'
 require 'sinatra/config_file'
 
 require_relative 'git'
+require_relative 'view'
 
 module RubWiki
   class App < Sinatra::Base
 
     register Sinatra::Reloader
+    also_reload "#{File.dirname(__FILE__)}/git.rb"
+    also_reload "#{File.dirname(__FILE__)}/view.rb"
+
     register Sinatra::ConfigFile
     config_file "#{File.dirname(__FILE__)}/../config/config.yml"
+
     set :views, "#{File.dirname(__FILE__)}/../views"
     set :public_folder, "#{File.dirname(__FILE__)}/../public"
+
+    helpers View
 
     get '/' do
       wiki = Git.new(settings.git_repo_path)
@@ -29,9 +36,8 @@ module RubWiki
     get '/*/history' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
-      path = append_ext(path) if File.extname(path).empty?
-      commits = wiki.history(path)
-      return history(commits)
+      commits = wiki.history(File.extname(path).empty? ? append_ext(path) : path)
+      return history(commits, path)
     end
 
     get '/*/revision/*' do
@@ -53,7 +59,7 @@ module RubWiki
       oid1 = params[:splat][1]
       oid2 = params[:splat][2]
       diff = wiki.diff(oid1, oid2)
-      return diff(diff)
+      return diff(diff, path, oid1, oid2)
     end
 
     get '/*/edit' do
@@ -67,7 +73,7 @@ module RubWiki
         oid = ""
         raw_data = ""
       end
-      return edit(raw_data, oid)
+      return edit(raw_data, oid, path)
     end
 
     get '/*/' do
@@ -75,7 +81,7 @@ module RubWiki
       dir = params[:splat].first
       halt unless wiki.dir?(dir)
       list = wiki.ls(dir)
-      return list(list)
+      return list(list, dir)
     end
 
     get '/*' do
@@ -113,15 +119,16 @@ module RubWiki
           wiki.commit(remote_user(), remote_user_mail(), commit_message)
           redirect to(URI.encode("/#{path}"))
         else
-          return conflict(raw_data_merged, oid_from_git)
+          return conflict(raw_data_merged, path, oid_from_git)
         end
       end
     end
 
     post '/*/preview' do
+      path = params[:splat].first
       raw_data = params[:data]
       oid = params[:oid]
-      return preview(raw_data, oid)
+      return preview(raw_data, oid, path)
     end
 
     private
@@ -166,62 +173,5 @@ module RubWiki
     def append_ext(path)
       return "#{path}.md"
     end
-
-    def diff(diff)
-      nav = haml :nav, locals: { path: nil }
-      article = haml :diff, locals: { diff: diff }
-      return page(nav, article)
-    end
-
-    def list(list)
-      nav = haml :nav, locals: { path: nil }
-      article = haml :list, locals: { list: list }
-      return page(nav, article)
-    end
-
-    def history(commits)
-      nav = haml :nav, locals: { path: nil }
-      article = haml :history, locals: { commits: commits }
-      return page(nav, article)
-    end
-
-    def conflict(raw_data, oid)
-      nav = haml :nav, locals: { path: nil }
-      form = haml :form, locals: { raw_data: raw_data, oid: oid }
-      article = haml :conflict, locals: { form: form }
-      return page(nav, article)
-    end
-
-    def preview(raw_data, oid)
-      nav = haml :nav, locals: { path: nil }
-      form = haml :form, locals: { raw_data: raw_data, oid: oid }
-      preview = markdown(raw_data)
-      article = haml :preview, locals: { form: form, preview: preview }
-      return page(nav, article)
-    end
-
-    def edit(raw_data, oid)
-      nav = haml :nav, locals: { path: nil }
-      form = haml :form, locals: { raw_data: raw_data, oid: oid }
-      article = haml :edit, locals: { form: form }
-      return page(nav, article)
-    end
-
-    def view(raw_data, path)
-      nav = haml :nav, locals: { path: path }
-      article = markdown(raw_data)
-      return page(nav, article)
-    end
-
-    def revision(raw_data, path, oid)
-      nav = haml :nav, locals: { path: nil }
-      article = markdown(raw_data)
-      return page(nav, article)
-    end
-
-    def page(nav, article)
-      return haml :page, locals: { nav: nav, article: article }
-    end
-
   end
 end
