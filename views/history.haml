@@ -1,11 +1,16 @@
 %ul
-  - @commits.each do |hash|
+  - for i in 0...@commits.length do
     %li<
-      #{hash[:time].strftime("%y/%m/%d %T")} #{hash[:author]}
-      - if hash[:oid]
-        %a{ :href => "revision/#{hash[:oid]}" }<
+      #{@commits[i][:time].strftime("%y/%m/%d %T")} #{@commits[i][:author]}
+      - if @commits[i][:oid]
+        %a{ :href => "revision/#{@commits[i][:oid]}" }<
           :escaped
-            #{hash[:message].chomp}
+            #{@commits[i][:message].chomp}
+        - if i != @commits.length - 1
+          [
+          %a{ :href => "diff/#{@commits[i][:oid]}/#{@commits[i+1][:oid]}" }<
+            diff
+          ]
       - else
         :escaped
-          #{hash[:message].chomp} (deleted)
+          #{@commits[i][:message].chomp} (deleted)
