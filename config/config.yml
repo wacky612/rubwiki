@@ -1,1 +1,2 @@
 git_repo_path: "/path/to/bare_repository.git"
+domain: "example.com"

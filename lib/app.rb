@@ -102,7 +102,7 @@ module RubWiki
 
       if oid_from_web == oid_from_git
         wiki.write("#{path}.md", raw_data_from_web)
-        wiki.commit(remote_user(), "#{remote_user()}@kmc.gr.jp", commit_message)
+        wiki.commit(remote_user(), remote_user_mail(), commit_message)
         redirect to(URI.encode("/#{path}"))
       else
         raw_data_old = wiki.read_from_oid(oid_from_web)
@@ -110,7 +110,7 @@ module RubWiki
         raw_data_merged, is_success = merge(raw_data_from_web, raw_data_old, raw_data_from_git)
         if is_success
           wiki.write("#{path}.md", raw_data_merged)
-          wiki.commit(remote_user(), "#{remote_user()}@kmc.gr.jp", commit_message)
+          wiki.commit(remote_user(), remote_user_mail(), commit_message)
           redirect to(URI.encode("/#{path}"))
         else
           return conflict(raw_data_merged, oid_from_git)
@@ -132,6 +132,11 @@ module RubWiki
       else
         return "anonymous"
       end
+    end
+
+    def remote_user_mail
+      domain = settings.domain
+      return "#{remote_user()}@#{domain}"
     end
 
     def guess_mime(path)
