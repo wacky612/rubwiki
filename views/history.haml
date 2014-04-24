@@ -1,0 +1,11 @@
+%ul
+  - @commits.each do |hash|
+    %li<
+      #{hash[:time].strftime("%y/%m/%d %T")} #{hash[:author]}
+      - if hash[:oid]
+        %a{ :href => "revision/#{hash[:oid]}" }<
+          :escaped
+            #{hash[:message].chomp}
+      - else
+        :escaped
+          #{hash[:message].chomp} (deleted)

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 require 'uri'
-require 'erb'
 require 'nkf'
 require 'haml'
 require 'kramdown'
@@ -24,7 +23,9 @@ module RubWiki
     get '/' do
       wiki = Git.new(settings.git_repo_path)
       @list = wiki.ls()
-      @contents = haml(erb(:list))
+
+      @nav = haml(:nav)
+      @article = haml(:list)
       return haml(:page)
     end
 
@@ -33,7 +34,9 @@ module RubWiki
       path = params[:splat].first
       path = "#{path}.md" if File.extname(path).empty?
       @commits = wiki.history(path)
-      @contents = haml(erb(:history))
+
+      @nav = haml(:nav)
+      @article = haml(:history)
       return haml(:page)
     end
 
@@ -43,7 +46,8 @@ module RubWiki
       revision = params[:splat].last
       raw_data = wiki.read_from_oid(revision)
       if File.extname(path).empty?
-        @contents = markdown(raw_data)
+        @nav = haml(:nav)
+        @article = markdown(raw_data)
         return haml(:page)
       else
         begin
@@ -61,7 +65,9 @@ module RubWiki
       oid1 = params[:splat][1]
       oid2 = params[:splat][2]
       @diff = wiki.diff(oid1, oid2)
-      @contents = haml(erb(:diff))
+
+      @nav = haml(:nav)
+      @article = haml(:diff)
       return haml(:page)
     end
 
@@ -76,7 +82,10 @@ module RubWiki
         @oid = ""
         @raw_data = ""
       end
-      @contents = haml(:edit)
+
+      @nav = haml(:nav)
+      @form = haml(:form)
+      @article = haml(:edit)
       return haml(:page)
     end
 
@@ -85,22 +94,25 @@ module RubWiki
       dir = params[:splat].first
       halt unless wiki.dir?(dir)
       @list = wiki.ls(dir)
-      @contents = haml(erb(:list))
+
+      @nav = haml(:nav)
+      @article = haml(:list)
       return haml(:page)
     end
 
     get '/*' do
       wiki = Git.new(settings.git_repo_path)
-      path = params[:splat].first
-      if File.extname(path).empty?
-        halt unless wiki.exist?("#{path}.md")
-        raw_data = wiki.read("#{path}.md")
-        @contents = markdown(raw_data)
+      @path = params[:splat].first
+      if File.extname(@path).empty?
+        halt unless wiki.exist?("#{@path}.md")
+        raw_data = wiki.read("#{@path}.md")
+        @nav = haml(:nav)
+        @article = markdown(raw_data)
         return haml(:page)
       else
-        halt unless wiki.exist?(path)
-        content_type MIME::Types.type_for(path)[0].to_s
-        return wiki.read(path)
+        halt unless wiki.exist?(@path)
+        content_type MIME::Types.type_for(@path)[0].to_s
+        return wiki.read(@path)
       end
     end
 
@@ -136,7 +148,9 @@ module RubWiki
           wiki.commit(remote_user(), "#{remote_user()}@kmc.gr.jp", commit_message)
           redirect to(URI.encode("/#{path}"))
         else
-          @contents = haml(:edit)
+          @form = haml(:form)
+          @nav = haml(:nav)
+          @article = haml(:conflict)
           return haml(:page)
         end
       end
@@ -145,8 +159,11 @@ module RubWiki
     post '/*/preview' do
       @raw_data = params[:data]
       @oid = params[:oid]
-      @contents = haml(:edit)
-      @contents << markdown(@raw_data)
+
+      @nav = haml(:nav)
+      @form = haml(:form)
+      @preview = markdown(@raw_data)
+      @article = haml(:preview)
       return haml(:page)
     end
 

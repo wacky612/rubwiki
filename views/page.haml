@@ -2,4 +2,6 @@
 %html{ html_attrs('ja') }
   %head
     %link{ :rel => "stylesheet", :type => "text/css", :href => url("/style.css") }
-  %body~ @contents
+  %body
+    %nav~ @nav
+    %article~ @article
