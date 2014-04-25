@@ -121,6 +121,11 @@ article {
     strong {
         color: red;
     }
+
+    span.revision {
+        color: dimgray;
+        font-style: italic;
+    }
 }
 
 code.diff_header {
