@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'uri'
 require 'nkf'
+require 'sass'
 require 'haml'
 require 'kramdown'
 require 'mime-types'
@@ -26,6 +27,10 @@ module RubWiki
     set :public_folder, "#{File.dirname(__FILE__)}/../public"
 
     helpers View
+
+    get '/style.css' do
+      scss :style, :style => :expanded
+    end
 
     get '/' do
       wiki = Git.new(settings.git_repo_path)
