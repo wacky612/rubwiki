@@ -7,3 +7,7 @@
       %a{ :href => url("/#{path}/edit") }< Edit
     %li<
       %a{ :href => url("/#{path}/history") }< History
+    - if File.extname(path).empty?
+      %li<
+        %a{ :href => url("/#{path}.md") }< Raw
+
