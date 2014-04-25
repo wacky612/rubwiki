@@ -8,6 +8,18 @@ module RubWiki
       @tree_oid = @repo.last_commit.tree.oid
     end
 
+    def can_create?(path)
+      path = path.split("/")
+      oid = @tree_oid
+
+      path.each do |name|
+        obj = @repo.lookup(oid)
+        return false if obj.instance_of?(Rugged::Blob)
+        return true unless obj[name]
+        oid = obj[name][:oid]
+      end
+    end
+
     def exist?(path)
       return get_oid(path) ? true : false
     end
@@ -31,11 +43,15 @@ module RubWiki
     end
 
     def read_from_oid(oid)
-      obj = @repo.lookup(oid)
+      begin
+        obj = @repo.lookup(oid)
 
-      if obj.instance_of?(Rugged::Blob)
-        return obj.text
-      else
+        if obj.instance_of?(Rugged::Blob)
+          return obj.text
+        else
+          return nil
+        end
+      rescue
         return nil
       end
     end
@@ -56,6 +72,7 @@ module RubWiki
 
     def oid(path)
       oid = get_oid(path)
+      return nil unless oid
       obj = @repo.lookup(oid)
 
       if obj.instance_of?(Rugged::Blob)
@@ -84,9 +101,13 @@ module RubWiki
     end
 
     def diff(oid1, oid2)
-      blob1 = @repo.lookup(oid1)
-      blob2 = @repo.lookup(oid2)
-      return blob2.diff(blob1)
+      begin
+        blob1 = @repo.lookup(oid1)
+        blob2 = @repo.lookup(oid2)
+        return blob2.diff(blob1)
+      rescue
+        return nil
+      end
     end
 
     def write(path, data)
@@ -124,13 +145,16 @@ module RubWiki
       path = path.split("/")
       oid = tree_oid || @tree_oid
 
-      path.each do |name|
-        obj = @repo.lookup(oid)
-        return nil unless obj[name]
-        oid = obj[name][:oid]
+      begin
+        path.each do |name|
+          obj = @repo.lookup(oid)
+          return nil unless obj[name]
+          oid = obj[name][:oid]
+        end
+        return oid
+      rescue
+        return nil
       end
-
-      return oid
     end
   end
 end

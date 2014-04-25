@@ -50,6 +50,7 @@ module RubWiki
       path = params[:splat].first
       revision = params[:splat].last
       raw_data = wiki.read_from_oid(revision)
+      halt unless raw_data
       if File.extname(path).empty?
         return revision(raw_data, path, revision)
       else
@@ -64,6 +65,7 @@ module RubWiki
       oid1 = params[:splat][1]
       oid2 = params[:splat][2]
       diff = wiki.diff(oid1, oid2)
+      halt unless diff
       return diff(diff, path, oid1, oid2)
     end
 
@@ -74,9 +76,11 @@ module RubWiki
         halt unless wiki.file?(append_ext(path))
         oid = wiki.oid(append_ext(path))
         raw_data = wiki.read(append_ext(path))
-      else
+      elsif wiki.can_create?(append_ext(path))
         oid = ""
         raw_data = ""
+      else
+        halt
       end
       return edit(raw_data, oid, path)
     end
