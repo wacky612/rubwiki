@@ -25,6 +25,7 @@ GEM
       rack-test
       sinatra (~> 1.4.0)
       tilt (~> 1.3)
+    string-scrub (0.0.3)
     tilt (1.4.1)
 
 PLATFORMS
@@ -38,3 +39,4 @@ DEPENDENCIES
   sass
   sinatra
   sinatra-contrib
+  string-scrub

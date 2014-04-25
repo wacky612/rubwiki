@@ -3,11 +3,11 @@
 %pre
   - diff.each_hunk do |hunk|
     %code.diff_header
-      &nbsp;&nbsp;#{hunk.header.force_encoding(Encoding::UTF_8)}
+      &nbsp;&nbsp;#{hunk.header.force_encoding(Encoding::UTF_8).scrub}
     - hunk.each_line do |line|
       - if line.addition?
-        %code.diff_addition +&nbsp;#{line.content.force_encoding(Encoding::UTF_8)}
+        %code.diff_addition +&nbsp;#{line.content.force_encoding(Encoding::UTF_8).scrub}
       - elsif line.deletion?
-        %code.diff_deletion -&nbsp;#{line.content.force_encoding(Encoding::UTF_8)}
+        %code.diff_deletion -&nbsp;#{line.content.force_encoding(Encoding::UTF_8).scrub}
       - else
-        %code &nbsp;&nbsp;#{line.content.force_encoding(Encoding::UTF_8)}
+        %code &nbsp;&nbsp;#{line.content.force_encoding(Encoding::UTF_8).scrub}
