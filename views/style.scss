@@ -41,8 +41,8 @@ nav {
 
 article {
     @include border;
-    -moz-box-flex: 1;
     -webkit-box-flex: 1;
+    -moz-box-flex: 1;
     margin: $margin;
     padding: 0 30px;
     background-color: white;
@@ -127,16 +127,25 @@ article {
         color: dimgray;
         font-style: italic;
     }
+
+    form {
+        margin: 10px 0;
+
+        input {
+            margin: 5px 0;
+        }
+    }
+
+    code.diff_header {
+        color: purple;
+    }
+
+    code.diff_addition {
+        color: green;
+    }
+
+    code.diff_deletion {
+        color: red;
+    }
 }
 
-code.diff_header {
-    color: purple;
-}
-
-code.diff_addition {
-    color: green;
-}
-
-code.diff_deletion {
-    color: red;
-}
