@@ -170,7 +170,7 @@ module RubWiki
         File.write("web", raw_data_from_web)
         File.write("old", raw_data_old)
         File.write("git", raw_data_from_git)
-        IO.popen("merge -p web old git", "r", :encoding => Encoding::UTF_8) do |io|
+        IO.popen("diff3 -m web old git", "r", :encoding => Encoding::UTF_8) do |io|
           raw_data_merged = io.read
         end
         File.delete("web")
