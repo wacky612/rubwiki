@@ -25,6 +25,7 @@ module RubWiki
 
     set :views, "#{File.dirname(__FILE__)}/../views"
     set :public_folder, "#{File.dirname(__FILE__)}/../public"
+    set :lock, true
 
     helpers View
 
