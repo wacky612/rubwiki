@@ -5,7 +5,8 @@
     %script{ :type => "text/javascript", :src => url("/post.js") }
   %body
     %nav
-      %img{ src: url("/logo.png") }
+      %a{ :href => "/" }<
+        %img{ src: url("/logo.png") }
       ~ nav
       %form{ :name => "search" }
         - action = url("/search")
