@@ -3,6 +3,7 @@ require 'uri'
 require 'nkf'
 require 'sass'
 require 'haml'
+require 'socket'
 require 'kramdown'
 require 'mime-types'
 
@@ -121,6 +122,7 @@ module RubWiki
       if oid_from_web == oid_from_git
         wiki.write(append_ext(path), raw_data_from_web)
         wiki.commit(remote_user(), remote_user_mail(), commit_message)
+        irc_notify(path, remote_user(), commit_message)
         redirect to(URI.encode("/#{path}"))
       else
         raw_data_old = wiki.read_from_oid(oid_from_web)
@@ -129,6 +131,7 @@ module RubWiki
         if is_success
           wiki.write(append_ext(path), raw_data_merged)
           wiki.commit(remote_user(), remote_user_mail(), commit_message)
+          irc_notify(path, remote_user(), commit_message)
           redirect to(URI.encode("/#{path}"))
         else
           return conflict(raw_data_merged, path, oid_from_git)
@@ -184,6 +187,20 @@ module RubWiki
 
     def append_ext(path)
       return "#{path}.md"
+    end
+
+    def irc_notify(path, author, commit_message)
+      TCPSocket.open(settings.irc_server, settings.irc_port) do |socket|
+        socket.puts("PASS #{settings.irc_pass}")
+        socket.puts("NICK #{settings.irc_nick}")
+        socket.puts("USER #{settings.irc_user}")
+        wikiname = settings.irc_wikiname
+        channel = settings.irc_channel
+        url = url("/#{URI.encode(path)}")
+        socket.puts("PRIVMSG #{channel} :[#{wikiname}] #{path} is updated by #{author}")
+        socket.puts("PRIVMSG #{channel} :[#{wikiname}] #{url}")
+        socket.puts("PRIVMSG #{channel} :[#{wikiname}] Commit Message: #{commit_message}")
+      end
     end
   end
 end
