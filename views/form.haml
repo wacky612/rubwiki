@@ -1,8 +1,9 @@
 %form{ :name => "edit" }
-  %textarea{ :name => "data", :rows => "30", :cols => "60" }= raw_data
+  %textarea{ :name => "data" }= raw_data
   %br
   Commit Message:
-  %input{ :type => "text", :name => "commit_message", :size => "80", :onkeydown => "if(event.keyCode == 13){post('edit', 'commit');}" }
+  %br
+  %input.text{ :type => "text", :name => "commit_message", :size => "80", :onkeydown => "if(event.keyCode == 13){post('edit', 'commit');}" }
   %br
   %input{ :type => "hidden", :name => "oid", :value => "#{oid}" }
   %input{ :type => "button", :value => "更新", :onclick => "return post('edit', 'commit');" }

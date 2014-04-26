@@ -146,6 +146,15 @@ article {
     form {
         margin: 10px 0;
 
+        textarea {
+            width: 100%;
+            height: 400px;
+        }
+
+        input.text {
+            width: 100%;
+        }
+
         input {
             margin: 5px 0;
         }
