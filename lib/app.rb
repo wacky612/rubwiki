@@ -207,7 +207,7 @@ module RubWiki
         socket.puts("PASS #{settings.irc_pass}")
         socket.puts("NICK #{settings.irc_nick}")
         socket.puts("USER #{settings.irc_user}")
-        wikiname = settings.irc_wikiname
+        wikiname = settings.wikiname
         channel = settings.irc_channel
         url = url("/#{URI.encode(path)}")
         socket.puts("PRIVMSG #{channel} :[#{wikiname}] #{path} is updated by #{author}")

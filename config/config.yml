@@ -1,10 +1,10 @@
 git_repo_path: "/path/to/bare_repository.git"
 domain: "example.com"
 front_page: "Front_Page"
+wikiname: "rubwiki"
 irc_server: "example.com"
 irc_port: 6666
 irc_nick: "nick"
 irc_user: "nick 0 * :nick"
 irc_pass: "password"
 irc_channel: "#rubwiki"
-irc_wikiname: "rubwiki"
