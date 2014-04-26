@@ -141,10 +141,18 @@ module RubWiki
     private
 
     def update_tree(tree_oid, path, blob_oid)
-      builder = Rugged::Tree::Builder.new(@repo.lookup(tree_oid))
+      builder = if tree_oid
+                  Rugged::Tree::Builder.new(@repo.lookup(tree_oid))
+                else
+                  Rugged::Tree::Builder.new()
+                end
       if path.include?("/")
         dirname = path.partition("/").first
-        new_oid = update_tree(builder[dirname][:oid], path.partition("/").last, blob_oid)
+        new_oid = if builder[dirname]
+                    update_tree(builder[dirname][:oid], path.partition("/").last, blob_oid)
+                  else
+                    update_tree(nil, path.partition("/").last, blob_oid)
+                  end
         builder.insert({ :name => dirname, :oid => new_oid, :filemode => 16384, :type => :tree })
       else
         builder.insert({ :name => path, :oid => blob_oid, :filemode => 33188, :type => :blob })
