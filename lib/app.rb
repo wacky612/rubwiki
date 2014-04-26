@@ -101,9 +101,14 @@ module RubWiki
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
       if File.extname(path).empty?
-        halt unless wiki.exist?(append_ext(path))
-        raw_data = wiki.read(append_ext(path))
-        return view(raw_data, path)
+        if wiki.exist?(append_ext(path))
+          raw_data = wiki.read(append_ext(path))
+          return view(raw_data, path)
+        elsif wiki.can_create?(append_ext(path))
+          redirect to(URI.encode("/#{path}/edit"))
+        else
+          halt
+        end
       else
         halt unless wiki.exist?(path)
         guess_mime(path)
