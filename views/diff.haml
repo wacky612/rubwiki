@@ -1,5 +1,5 @@
 %h1.title #{path}
-#{oid2} → #{oid1} の変更点
+%span.revision Changes from #{oid2} to #{oid1}
 %pre
   - diff.each_hunk do |hunk|
     %code.diff_header
