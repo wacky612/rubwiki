@@ -45,6 +45,7 @@ module RubWiki
     get '/*/history' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
+      halt unless valid_path?(path)
       commits = wiki.history(File.extname(path).empty? ? append_ext(path) : path)
       return history(commits, path)
     end
@@ -53,6 +54,7 @@ module RubWiki
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
       revision = params[:splat].last
+      halt unless valid_path?(path)
       raw_data = wiki.read_from_oid(revision)
       halt unless raw_data
       if File.extname(path).empty?
@@ -68,6 +70,7 @@ module RubWiki
       path = params[:splat].first
       oid1 = params[:splat][1]
       oid2 = params[:splat][2]
+      halt unless valid_path?(path)
       diff = wiki.diff(oid1, oid2)
       halt unless diff
       return diff(diff, path, oid1, oid2)
@@ -76,6 +79,7 @@ module RubWiki
     get '/*/edit' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
+      halt unless valid_path?(path)
       if wiki.exist?(append_ext(path))
         halt unless wiki.file?(append_ext(path))
         oid = wiki.oid(append_ext(path))
@@ -92,6 +96,7 @@ module RubWiki
     get '/*/' do
       wiki = Git.new(settings.git_repo_path)
       dir = params[:splat].first
+      halt unless valid_path?(path)
       halt unless wiki.dir?(dir)
       list = wiki.ls(dir)
       return list(list, dir)
@@ -100,6 +105,7 @@ module RubWiki
     get '/*' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
+      halt unless valid_path?(path)
       if File.extname(path).empty?
         if wiki.exist?(append_ext(path))
           raw_data = wiki.read(append_ext(path))
@@ -119,6 +125,7 @@ module RubWiki
     post '/*/commit' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
+      halt unless valid_path?(path)
       raw_data_from_web = NKF.nkf("-Luw", params[:data])
       commit_message = params[:commit_message]
       oid_from_web = params[:oid]
@@ -147,6 +154,7 @@ module RubWiki
 
     post '/*/preview' do
       path = params[:splat].first
+      halt unless valid_path?(path)
       raw_data = params[:data]
       oid = params[:oid]
       return preview(raw_data, oid, path)
@@ -160,6 +168,12 @@ module RubWiki
     end
 
     private
+
+    def valid_path?(path)
+      names = path.split("/")
+      forbidden_words = ["edit", "preview", "commit", "diff", "search", "history", "revision"]
+      return (names & forbidden_words).empty?
+    end
 
     def remote_user
       if request.env['REMOTE_USER']
