@@ -118,11 +118,12 @@ module RubWiki
       commit_message = params[:commit_message]
       oid_from_web = params[:oid]
       oid_from_git = wiki.oid(append_ext(path))
+      is_notify = params[:irc_notification] != "dont_notify"
 
       if oid_from_web == oid_from_git
         wiki.write(append_ext(path), raw_data_from_web)
         wiki.commit(remote_user(), remote_user_mail(), commit_message)
-        irc_notify(path, remote_user(), commit_message)
+        irc_notify(path, remote_user(), commit_message) if is_notify
         redirect to(URI.encode("/#{path}"))
       else
         raw_data_old = wiki.read_from_oid(oid_from_web)
@@ -131,7 +132,7 @@ module RubWiki
         if is_success
           wiki.write(append_ext(path), raw_data_merged)
           wiki.commit(remote_user(), remote_user_mail(), commit_message)
-          irc_notify(path, remote_user(), commit_message)
+          irc_notify(path, remote_user(), commit_message) if is_notify
           redirect to(URI.encode("/#{path}"))
         else
           return conflict(raw_data_merged, path, oid_from_git)
