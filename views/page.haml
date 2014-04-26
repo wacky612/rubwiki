@@ -2,8 +2,14 @@
 %html{ html_attrs('ja') }
   %head
     %link{ :rel => "stylesheet", :type => "text/css", :href => url("/style.css") }
+    %script{ :type => "text/javascript", :src => url("/post.js") }
   %body
     %nav
       %img{ src: url("/logo.png") }
       ~ nav
+      %form{ :name => "search" }
+        - action = url("/search")
+        %input.text{ :type => "text", :name => "keyword", :onkeydown => "if(event.keyCode == 13){_search('#{action}');}" }
+        %br
+        %input{ :type => "button", :value =>"検索", :onclick => "return _search('#{action}');" }
     %article~ article

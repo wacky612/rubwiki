@@ -34,8 +34,23 @@ nav {
         @include border;
         margin: 0px;
         padding: 10px 30px;
+        margin: 0 0 14px 0;
         list-style-type: square;
         background-color: white;
+    }
+
+    form {
+        @include border;
+        width: 150px;
+        background-color: white;
+        padding: 10px;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+
+        input.text {
+            width: 122px;
+        }
     }
 }
 

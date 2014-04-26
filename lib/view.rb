@@ -1,5 +1,11 @@
 module RubWiki
   module View
+    def search(keyword, result)
+      nav = haml :nav, locals: { path: nil }
+      article = haml :search, locals: { result: result, keyword: keyword }
+      return page(nav, article)
+    end
+
     def diff(diff, path, oid1, oid2)
       nav = haml :nav, locals: { path: nil }
       article = haml :diff, locals: { diff: diff, path: path, oid1: oid1, oid2: oid2 }

@@ -127,6 +127,17 @@ module RubWiki
       Rugged::Commit.create(@repo, options)
     end
 
+    def search(keyword)
+      result = []
+      @repo.lookup(@tree_oid).walk_blobs do |root, entry|
+        raw_data = read_from_oid(entry[:oid])
+        if raw_data.include?(keyword)
+          result << "#{root}#{entry[:name]}"
+        end
+      end
+      return result
+    end
+
     private
 
     def update_tree(tree_oid, path, blob_oid)
