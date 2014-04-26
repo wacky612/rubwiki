@@ -42,13 +42,6 @@ module RubWiki
       return list(list)
     end
 
-    get '/search/*' do
-      wiki = Git.new(settings.git_repo_path)
-      keyword = params[:splat].first
-      result = wiki.search(keyword)
-      return search(keyword, result)
-    end
-
     get '/*/history' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
@@ -157,6 +150,13 @@ module RubWiki
       raw_data = params[:data]
       oid = params[:oid]
       return preview(raw_data, oid, path)
+    end
+
+    post '/search' do
+      wiki = Git.new(settings.git_repo_path)
+      keyword = params[:keyword]
+      result = wiki.search(keyword)
+      return search(keyword, result)
     end
 
     private

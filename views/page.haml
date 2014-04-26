@@ -9,7 +9,7 @@
       ~ nav
       %form{ :name => "search" }
         - action = url("/search")
-        %input.text{ :type => "text", :name => "keyword", :onkeydown => "if(event.keyCode == 13){_search('#{action}');}" }
+        %input.text{ :type => "text", :name => "keyword", :onkeydown => "if(event.keyCode == 13){post('search', '#{action}');}" }
         %br
-        %input{ :type => "button", :value =>"検索", :onclick => "return _search('#{action}');" }
+        %input{ :type => "button", :value =>"検索", :onclick => "return post('search', '#{action}');" }
     %article~ article
