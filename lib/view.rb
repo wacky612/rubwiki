@@ -61,13 +61,13 @@ module RubWiki
     end
 
     def invalid_path(path)
-      nav = haml :nav, locals: { path: path }
+      nav = haml :nav, locals: { path: nil }
       article = haml :invalid_path, locals: { path: path }
       return page(nav, article)
     end
 
     def cannot_create(path)
-      nav = haml :nav, locals: { path: path }
+      nav = haml :nav, locals: { path: nil }
       article = haml :cannot_create, locals: { path: path }
       return page(nav, article)
     end
