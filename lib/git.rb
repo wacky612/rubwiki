@@ -47,7 +47,7 @@ module RubWiki
         obj = @repo.lookup(oid)
 
         if obj.instance_of?(Rugged::Blob)
-          return obj.text
+          return obj.text.force_encoding(Encoding::UTF_8)
         else
           return nil
         end
