@@ -217,12 +217,12 @@ module RubWiki
     end
 
     def irc_notify(path, author, commit_message)
-      TCPSocket.open(settings.irc_server, settings.irc_port) do |socket|
-        socket.puts("PASS #{settings.irc_pass}")
-        socket.puts("NICK #{settings.irc_nick}")
-        socket.puts("USER #{settings.irc_user}")
+      TCPSocket.open(settings.irc[:server], settings.irc[:port]) do |socket|
+        socket.puts("PASS #{settings.irc[:pass]}")
+        socket.puts("NICK #{settings.irc[:nick]}")
+        socket.puts("USER #{settings.irc[:user]}")
         wikiname = settings.wikiname
-        channel = settings.irc_channel
+        channel = settings.irc[:channel]
         url = url("/#{URI.encode(path)}")
         socket.puts("PRIVMSG #{channel} :[#{wikiname}] #{path} is updated by #{author}")
         socket.puts("PRIVMSG #{channel} :[#{wikiname}] #{url}")

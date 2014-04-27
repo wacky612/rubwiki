@@ -1,0 +1,11 @@
+git_repo_path: "/path/to/bare_repository.git"
+domain: "example.com"
+front_page: "Front_Page"
+wikiname: "rubwiki"
+irc:
+  server: "example.com"
+  port: 6666
+  nick: "nick"
+  user: "nick 0 * :nick"
+  pass: "password"
+  channel: "#rubwiki"
