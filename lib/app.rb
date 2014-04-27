@@ -96,7 +96,7 @@ module RubWiki
     get '/*/' do
       wiki = Git.new(settings.git_repo_path)
       dir = params[:splat].first
-      halt unless valid_path?(path)
+      halt unless valid_path?(dir)
       halt unless wiki.dir?(dir)
       list = wiki.ls(dir)
       return list(list, dir)
