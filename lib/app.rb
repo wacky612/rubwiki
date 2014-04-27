@@ -163,6 +163,7 @@ module RubWiki
     post '/search' do
       wiki = Git.new(settings.git_repo_path)
       keyword = params[:keyword]
+      halt if keyword.empty?
       result = wiki.search(keyword)
       return search(keyword, result)
     end
