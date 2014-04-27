@@ -4,30 +4,45 @@
     border-color: silver;
 }
 
+@mixin box {
+    display: box;
+    display: -moz-box;
+    display: -webkit-box;
+}
+
+@mixin box-sizing {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+@mixin box-flex {
+    -webkit-box-flex: 1;
+    -moz-box-flex: 1;
+    box-flex: 1;
+}
+
 $margin: 7px;
+$nav_width: 150px;
 
 html {
     background-color: ghostwhite;
 }
 
 body {
-    display: box;
-    display: -moz-box;
-    display: -webkit-box;
+    @include box;
+    @include box-sizing;
     width: 100%;
     margin: 0px;
     padding: $margin;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
 }
 
 nav {
-    width: 150px;
+    width: $nav_width;
     margin: $margin;
 
     img {
-        width: 150px;
+        width: $nav_width;
         margin: 0 0 10px 0;
     }
 
@@ -42,24 +57,20 @@ nav {
 
     form {
         @include border;
-        width: 150px;
+        @include box-sizing;
+        width: $nav_width;
         background-color: white;
         padding: 10px;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
 
         input.text {
-            width: 122px;
+            width: $nav_width - 28px;
         }
     }
 }
 
 article {
     @include border;
-    -webkit-box-flex: 1;
-    -moz-box-flex: 1;
-    box-flex: 1;
+    @include box-flex;
     margin: $margin;
     padding: 0 30px;
     background-color: white;
@@ -130,10 +141,6 @@ article {
         dt {
             font-weight: bold;
         }
-    }
-
-    p {
-        line-height: 1.5em;
     }
 
     strong {
