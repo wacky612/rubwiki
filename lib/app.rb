@@ -32,7 +32,7 @@ module RubWiki
 
     helpers View
 
-    get '/style.css' do
+    get '/css/style.css' do
       scss :style, :style => :expanded
     end
 

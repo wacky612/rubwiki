@@ -1,7 +1,7 @@
 !!! 5
 %html{ html_attrs('ja') }
   %head
-    %link{ :rel => "stylesheet", :type => "text/css", :href => url("/style.css") }
+    %link{ :rel => "stylesheet", :type => "text/css", :href => url("/css/style.css") }
     %script{ :type => "text/javascript", :src => url("/js/post.js") }
     %script{ :type => "text/javascript", :src => url("/js/jquery-2.1.0.min.js") }
     %script{ :type => "text/javascript", :src => url("/js/flexie.min.js") }
@@ -9,7 +9,7 @@
   %body
     %nav
       %a{ :href => "/" }<
-        %img{ src: url("/logo.png") }
+        %img{ src: url("/img/logo.png") }
       ~ nav
       %form{ :name => "search" }
         - action = url("/search")
