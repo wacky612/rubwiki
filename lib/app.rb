@@ -45,7 +45,7 @@ module RubWiki
     get '/*/history' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
-      halt invalid_path(path) unless valid_path?(path)
+      halt 403, invalid_path(path) unless valid_path?(path)
       commits = wiki.history(File.extname(path).empty? ? append_ext(path) : path)
       return history(commits, path)
     end
@@ -54,9 +54,9 @@ module RubWiki
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
       revision = params[:splat].last
-      halt invalid_path(path) unless valid_path?(path)
+      halt 403, invalid_path(path) unless valid_path?(path)
       raw_data = wiki.read_from_oid(revision)
-      halt invalid_revision(revision) unless raw_data
+      halt 404, invalid_revision(revision) unless raw_data
       if File.extname(path).empty?
         return revision(raw_data, path, revision)
       else
@@ -70,26 +70,26 @@ module RubWiki
       path = params[:splat].first
       oid1 = params[:splat][1]
       oid2 = params[:splat][2]
-      halt invalid_path(path) unless valid_path?(path)
+      halt 403, invalid_path(path) unless valid_path?(path)
       diff = wiki.diff(oid1, oid2)
-      halt invalid_diff(oid1, oid2) unless diff
+      halt 404, invalid_diff(oid1, oid2) unless diff
       return diff(diff, path, oid1, oid2)
     end
 
     get '/*/edit' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
-      halt invalid_path(path) unless valid_path?(path)
-      halt cannot_edit(path) unless File.extname(path).empty?
+      halt 403, invalid_path(path) unless valid_path?(path)
+      halt 403, cannot_edit(path) unless File.extname(path).empty?
       if wiki.exist?(append_ext(path))
-        halt exist_dir(append_ext(path)) unless wiki.file?(append_ext(path))
+        halt 403, exist_dir(append_ext(path)) unless wiki.file?(append_ext(path))
         oid = wiki.oid(append_ext(path))
         raw_data = wiki.read(append_ext(path))
       elsif wiki.can_create?(append_ext(path))
         oid = ""
         raw_data = ""
       else
-        halt cannot_create(path)
+        halt 403, cannot_create(path)
       end
       return edit(raw_data, oid, path)
     end
@@ -97,8 +97,8 @@ module RubWiki
     get '/*/' do
       wiki = Git.new(settings.git_repo_path)
       dir = params[:splat].first
-      halt invalid_path(dir) unless valid_path?(dir)
-      halt not_exist_dir(dir) unless wiki.dir?(dir)
+      halt 403, invalid_path(dir) unless valid_path?(dir)
+      halt 404, not_exist_dir(dir) unless wiki.dir?(dir)
       list = wiki.ls(dir)
       return list(list, dir)
     end
@@ -106,20 +106,20 @@ module RubWiki
     get '/*' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
-      halt invalid_path(path) unless valid_path?(path)
+      halt 403, invalid_path(path) unless valid_path?(path)
       if File.extname(path).empty?
         if wiki.exist?(append_ext(path))
-          halt exist_dir(append_ext(path)) if wiki.dir?(append_ext(path))
+          halt 403, exist_dir(append_ext(path)) if wiki.dir?(append_ext(path))
           raw_data = wiki.read(append_ext(path))
           return view(raw_data, path)
         elsif wiki.can_create?(append_ext(path))
           redirect to(URI.encode("/#{path}/edit"))
         else
-          halt cannot_create(path)
+          halt 403, cannot_create(path)
         end
       else
         redirect to(URI.encode("/#{path}/")) if wiki.dir?(path)
-        halt not_exist(path) unless wiki.exist?(path)
+        halt 404, not_exist(path) unless wiki.exist?(path)
         guess_mime(path)
         return wiki.read(path)
       end
@@ -128,7 +128,7 @@ module RubWiki
     post '/*/commit' do
       wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
-      halt invalid_path(path) unless valid_path?(path)
+      halt 403, invalid_path(path) unless valid_path?(path)
       raw_data_from_web = NKF.nkf("-Luw", params[:data])
       commit_message = params[:commit_message]
       oid_from_web = params[:oid]
@@ -157,7 +157,7 @@ module RubWiki
 
     post '/*/preview' do
       path = params[:splat].first
-      halt invalid_path(path) unless valid_path?(path)
+      halt 403, invalid_path(path) unless valid_path?(path)
       raw_data = params[:data]
       oid = params[:oid]
       return preview(raw_data, oid, path)
@@ -166,7 +166,7 @@ module RubWiki
     post '/search' do
       wiki = Git.new(settings.git_repo_path)
       keyword = params[:keyword]
-      halt empty_search() if keyword.empty?
+      halt 403, empty_search() if keyword.empty?
       result = wiki.search(keyword)
       return search(keyword, result)
     end
