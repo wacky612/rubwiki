@@ -60,6 +60,60 @@ module RubWiki
       return page(nav, article)
     end
 
+    def invalid_path(path)
+      nav = haml :nav, locals: { path: path }
+      article = haml :invalid_path, locals: { path: path }
+      return page(nav, article)
+    end
+
+    def cannot_create(path)
+      nav = haml :nav, locals: { path: path }
+      article = haml :cannot_create, locals: { path: path }
+      return page(nav, article)
+    end
+
+    def invalid_revision(oid)
+      nav = haml :nav, locals: { path: nil }
+      article = haml :invalid_revision, locals: { oid: oid }
+      return page(nav, article)
+    end
+
+    def invalid_diff(oid1, oid2)
+      nav = haml :nav, locals: { path: nil }
+      article = haml :invalid_diff, locals: { oid1: oid1, oid2: oid2 }
+      return page(nav, article)
+    end
+
+    def cannot_edit(path)
+      nav = haml :nav, locals: { path: nil }
+      article = haml :cannot_edit, locals: { path: path }
+      return page(nav, article)
+    end
+
+    def exist_dir(path)
+      nav = haml :nav, locals: { path: nil }
+      article = haml :exist_dir, locals: { path: path }
+      return page(nav, article)
+    end
+
+    def not_exist(path)
+      nav = haml :nav, locals: { path: nil }
+      article = haml :not_exist, locals: { path: path }
+      return page(nav, article)
+    end
+
+    def empty_search
+      nav = haml :nav, locals: { path: nil }
+      article = haml :empty_search
+      return page(nav, article)
+    end
+
+    def not_exist_dir(path)
+      nav = haml :nav, locals: { path: nil }
+      article = haml :not_exist_dir, locals: { path: path }
+      return page(nav, article)
+    end
+
     def page(nav, article)
       return haml :page, locals: { nav: nav, article: article }
     end
