@@ -3,6 +3,7 @@ domain: "example.com"
 front_page: "Front_Page"
 wikiname: "rubwiki"
 irc:
+  enable: false
   server: "example.com"
   port: 6666
   nick: "nick"
