@@ -138,6 +138,15 @@ module RubWiki
       return result
     end
 
+    def search_file(basename)
+      @repo.lookup(@tree_oid).walk_blobs do |root, entry|
+        if File.basename(entry[:name], ".md") == basename
+          return "/#{root}#{File.basename(entry[:name], '.md')}"
+        end
+      end
+      return ""
+    end
+
     private
 
     def update_tree(tree_oid, path, blob_oid)

@@ -31,10 +31,10 @@ module RubWiki
       return page(nav, article)
     end
 
-    def preview(raw_data, oid, path)
+    def preview(raw_data, oid, path, wiki)
       nav = haml :nav, locals: { path: nil }
       form = haml :form, locals: { raw_data: raw_data, oid: oid }
-      preview = markdown(raw_data)
+      preview = markdown(autolink(raw_data, wiki))
       article = haml :preview, locals: { form: form, preview: preview, path: path }
       return page(nav, article)
     end
@@ -46,16 +46,16 @@ module RubWiki
       return page(nav, article)
     end
 
-    def view(raw_data, path)
+    def view(raw_data, path, wiki)
       nav = haml :nav, locals: { path: path }
-      contents = markdown(raw_data)
+      contents = markdown(autolink(raw_data, wiki))
       article = haml :view, locals: { contents: contents, path: path }
       return page(nav, article)
     end
 
-    def revision(raw_data, path, oid)
+    def revision(raw_data, path, oid, wiki)
       nav = haml :nav, locals: { path: nil }
-      contents = markdown(raw_data)
+      contents = markdown(autolink(raw_data, wiki))
       article = haml :revision, locals: { contents: contents, path: path, oid: oid }
       return page(nav, article)
     end
@@ -116,6 +116,12 @@ module RubWiki
 
     def page(nav, article)
       return haml :page, locals: { nav: nav, article: article }
+    end
+
+    def autolink(raw_data, wiki)
+      return raw_data.gsub(/\[(.+)\]\(\)/) do
+        "[#{$1}](#{wiki.search_file($1)})"
+      end
     end
   end
 end

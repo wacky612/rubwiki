@@ -58,7 +58,7 @@ module RubWiki
       raw_data = wiki.read_from_oid(revision)
       halt 404, invalid_revision(revision) unless raw_data
       if File.extname(path).empty?
-        return revision(raw_data, path, revision)
+        return revision(raw_data, path, revision, wiki)
       else
         guess_mime(path)
         return raw_data
@@ -111,7 +111,7 @@ module RubWiki
         if wiki.exist?(append_ext(path))
           halt 403, exist_dir(append_ext(path)) if wiki.dir?(append_ext(path))
           raw_data = wiki.read(append_ext(path))
-          return view(raw_data, path)
+          return view(raw_data, path, wiki)
         elsif wiki.can_create?(append_ext(path))
           redirect to(URI.encode("/#{path}/edit"))
         else
@@ -156,11 +156,12 @@ module RubWiki
     end
 
     post '/*/preview' do
+      wiki = Git.new(settings.git_repo_path)
       path = params[:splat].first
       halt 403, invalid_path(path) unless valid_path?(path)
       raw_data = params[:data]
       oid = params[:oid]
-      return preview(raw_data, oid, path)
+      return preview(raw_data, oid, path, wiki)
     end
 
     post '/search' do
