@@ -9,5 +9,5 @@
         %code.diff_addition +&nbsp;#{line.content.force_encoding(Encoding::UTF_8).scrub}
       - elsif line.deletion?
         %code.diff_deletion -&nbsp;#{line.content.force_encoding(Encoding::UTF_8).scrub}
-      - else
+      - elsif line.context?
         %code &nbsp;&nbsp;#{line.content.force_encoding(Encoding::UTF_8).scrub}
