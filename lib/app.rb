@@ -36,8 +36,13 @@ module RubWiki
       return @@baseurl
     end
 
+    def App.wiki
+      return @@wiki
+    end
+
     before do
       @@baseurl = url("/")
+      @@wiki = Git.new(settings.git_repo_path)
     end
 
     helpers View
