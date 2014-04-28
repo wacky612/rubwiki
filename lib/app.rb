@@ -15,6 +15,7 @@ require 'sinatra/config_file'
 
 require_relative 'git'
 require_relative 'view'
+require_relative 'kramdown_patch'
 
 module RubWiki
   class App < Sinatra::Base
@@ -22,6 +23,7 @@ module RubWiki
     register Sinatra::Reloader
     also_reload "#{File.dirname(__FILE__)}/git.rb"
     also_reload "#{File.dirname(__FILE__)}/view.rb"
+    also_reload "#{File.dirname(__FILE__)}/kramdown_patch.rb"
 
     register Sinatra::ConfigFile
     config_file "#{File.dirname(__FILE__)}/../config/config.yml"
@@ -29,6 +31,14 @@ module RubWiki
     set :views, "#{File.dirname(__FILE__)}/../views"
     set :public_folder, "#{File.dirname(__FILE__)}/../public"
     set :lock, true
+
+    def App.baseurl
+      return @@baseurl
+    end
+
+    before do
+      @@baseurl = url("/")
+    end
 
     helpers View
 
