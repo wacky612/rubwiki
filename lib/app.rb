@@ -44,13 +44,13 @@ module RubWiki
     end
 
     get '/*/!history' do |path|
-      halt(403, @view.invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.invalid_path(path)) if invalid_path?(path)
       commits = @wiki.history(File.extname(path).empty? ? append_ext(path) : path)
       return @view.history(commits, path)
     end
 
     get '/*/!revision/*' do |path, revision|
-      halt(403, @view.invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.invalid_path(path)) if invalid_path?(path)
       raw_data = @wiki.read_from_oid(revision)
       halt(404, @view.invalid_revision(revision)) unless raw_data
       if File.extname(path).empty?
@@ -62,14 +62,14 @@ module RubWiki
     end
 
     get '/*/!diff/*/*' do |path, oid1, oid2|
-      halt(403, @view.invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.invalid_path(path)) if invalid_path?(path)
       diff = @wiki.diff(oid1, oid2)
       halt(404, @view.invalid_diff(oid1, oid2)) unless diff
       return @view.diff(diff, path, oid1, oid2)
     end
 
     get '/*/!edit' do |path|
-      halt(403, @view.invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.invalid_path(path)) if invalid_path?(path)
       halt(403, @view.cannot_edit(path)) unless File.extname(path).empty?
       if @wiki.exist?(append_ext(path))
         halt(403, @view.exist_dir(append_ext(path))) unless @wiki.file?(append_ext(path))
@@ -85,14 +85,14 @@ module RubWiki
     end
 
     get '/*/' do |dir|
-      halt(403, @view.invalid_path(dir)) unless valid_path?(dir)
+      halt(403, @view.invalid_path(dir)) if invalid_path?(dir)
       halt(404, @view.not_exist_dir(dir)) unless @wiki.dir?(dir)
       list = @wiki.ls(dir)
       return @view.list(list, dir)
     end
 
     get '/*' do |path|
-      halt(403, @view.invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.invalid_path(path)) if invalid_path?(path)
       if File.extname(path).empty?
         if @wiki.exist?(append_ext(path))
           halt(403, @view.exist_dir(append_ext(path))) if @wiki.dir?(append_ext(path))
@@ -112,7 +112,7 @@ module RubWiki
     end
 
     post '/*/!commit' do |path|
-      halt(403, @view.invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.invalid_path(path)) if invalid_path?(path)
       raw_data_from_web = NKF.nkf("-Luw", params[:data])
       commit_message = params[:commit_message]
       oid_from_web = params[:oid]
@@ -140,7 +140,7 @@ module RubWiki
     end
 
     post '/*/!preview' do |path|
-      halt(403, @view.invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.invalid_path(path)) if invalid_path?(path)
       raw_data = params[:data]
       oid = params[:oid]
       return @view.preview(raw_data, oid, path)
@@ -155,8 +155,8 @@ module RubWiki
 
     private
 
-    def valid_path?(path)
-      return !path.include?("/!")
+    def invalid_path?(path)
+      return path.include?("/!")
     end
 
     def remote_user
