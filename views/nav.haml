@@ -10,5 +10,5 @@
       %a{ href: "#{baseurl}/#{path}/!history" }< History
     - if File.extname(path).empty?
       %li<
-        %a{ href: "#{baseurl}/#{path}.md" }< Raw
+        %a{ href: "#{baseurl}/#{path}#{RubWiki::App::DefaultExt}" }< Raw
 

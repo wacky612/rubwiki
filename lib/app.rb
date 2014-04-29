@@ -14,6 +14,7 @@ require_relative 'view'
 
 module RubWiki
   class App < Sinatra::Base
+    DefaultExt = ".md"
 
     configure :development do
       register Sinatra::Reloader
@@ -199,7 +200,7 @@ module RubWiki
     end
 
     def append_ext(path)
-      return "#{path}.md"
+      return "#{path}#{DefaultExt}"
     end
 
     def irc_notify(path, author, commit_message)

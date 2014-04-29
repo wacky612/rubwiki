@@ -7,6 +7,6 @@
         %a{ href: "#{hash[:name]}/" }<
           #{hash[:name]}/
       - else
-        - filename = File.basename(hash[:name], ".md")
+        - filename = File.basename(hash[:name], RubWiki::App::DefaultExt)
         %a{ href: "#{filename}" }<
           #{filename}
