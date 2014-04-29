@@ -1,6 +1,7 @@
+-# coding: utf-8
 %h1.title #{keyword} の検索結果
 %ul
   - result.each do |path|
     - if File.extname(path) == ".md"
       %li<
-        %a{ :href => url("/#{path[0...-3]}") }< #{path[0...-3]}
+        %a{ :href => "#{baseurl}#{path[0...-3]}" }< #{path[0...-3]}

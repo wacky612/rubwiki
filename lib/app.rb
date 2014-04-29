@@ -2,9 +2,7 @@
 require 'uri'
 require 'nkf'
 require 'sass'
-require 'haml'
 require 'socket'
-require 'kramdown'
 require 'mime-types'
 
 require 'string/scrub'
@@ -15,7 +13,6 @@ require 'sinatra/config_file'
 
 require_relative 'git'
 require_relative 'view'
-require_relative 'kramdown_patch'
 
 module RubWiki
   class App < Sinatra::Base
@@ -28,49 +25,36 @@ module RubWiki
     register Sinatra::ConfigFile
     config_file "#{File.dirname(__FILE__)}/../config/config.yml"
 
-    set :views, "#{File.dirname(__FILE__)}/../views"
     set :public_folder, "#{File.dirname(__FILE__)}/../public"
+    set :views, "#{File.dirname(__FILE__)}/../views"
     set :lock, true
 
-    def App.baseurl
-      return @@baseurl
-    end
-
-    def App.wiki
-      return @@wiki
-    end
-
     before do
-      @@baseurl = url("/")
-      @@wiki = Git.new(settings.git_repo_path)
+      @wiki = Git.new(settings.git_repo_path)
+      @view = View.new(@wiki, url("/"), settings)
     end
-
-    helpers View
 
     get '/css/style.css' do
       scss :style, :style => :compressed
     end
 
     get '/' do
-      wiki = Git.new(settings.git_repo_path)
-      list = wiki.ls()
-      return list(list)
+      list = @wiki.ls()
+      return @view.list(list)
     end
 
     get '/*/!history' do |path|
-      wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(path)) unless valid_path?(path)
-      commits = wiki.history(File.extname(path).empty? ? append_ext(path) : path)
-      return history(commits, path)
+      commits = @wiki.history(File.extname(path).empty? ? append_ext(path) : path)
+      return @view.history(commits, path)
     end
 
     get '/*/!revision/*' do |path, revision|
-      wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(path)) unless valid_path?(path)
-      raw_data = wiki.read_from_oid(revision)
+      raw_data = @wiki.read_from_oid(revision)
       halt(404, invalid_revision(revision)) unless raw_data
       if File.extname(path).empty?
-        return revision(raw_data, path, revision, wiki)
+        return @view.revision(raw_data, path, revision)
       else
         guess_mime(path)
         return raw_data
@@ -78,102 +62,95 @@ module RubWiki
     end
 
     get '/*/!diff/*/*' do |path, oid1, oid2|
-      wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(path)) unless valid_path?(path)
-      diff = wiki.diff(oid1, oid2)
+      diff = @wiki.diff(oid1, oid2)
       halt(404, invalid_diff(oid1, oid2)) unless diff
-      return diff(diff, path, oid1, oid2)
+      return @view.diff(diff, path, oid1, oid2)
     end
 
     get '/*/!edit' do |path|
-      wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(path)) unless valid_path?(path)
       halt(403, cannot_edit(path)) unless File.extname(path).empty?
-      if wiki.exist?(append_ext(path))
-        halt(403, exist_dir(append_ext(path))) unless wiki.file?(append_ext(path))
-        oid = wiki.oid(append_ext(path))
-        raw_data = wiki.read(append_ext(path))
-      elsif wiki.can_create?(append_ext(path))
+      if @wiki.exist?(append_ext(path))
+        halt(403, exist_dir(append_ext(path))) unless @wiki.file?(append_ext(path))
+        oid = @wiki.oid(append_ext(path))
+        raw_data = @wiki.read(append_ext(path))
+      elsif @wiki.can_create?(append_ext(path))
         oid = ""
         raw_data = ""
       else
         halt(403, cannot_create(path))
       end
-      return edit(raw_data, oid, path)
+      return @view.edit(raw_data, oid, path)
     end
 
     get '/*/' do |dir|
-      wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(dir)) unless valid_path?(dir)
-      halt(404, not_exist_dir(dir)) unless wiki.dir?(dir)
-      list = wiki.ls(dir)
-      return list(list, dir)
+      halt(404, not_exist_dir(dir)) unless @wiki.dir?(dir)
+      list = @wiki.ls(dir)
+      return @view.list(list, dir)
     end
 
     get '/*' do |path|
-      wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(path)) unless valid_path?(path)
       if File.extname(path).empty?
-        if wiki.exist?(append_ext(path))
-          halt(403, exist_dir(append_ext(path))) if wiki.dir?(append_ext(path))
-          raw_data = wiki.read(append_ext(path))
-          return view(raw_data, path, wiki)
-        elsif wiki.can_create?(append_ext(path))
+        if @wiki.exist?(append_ext(path))
+          halt(403, exist_dir(append_ext(path))) if @wiki.dir?(append_ext(path))
+          raw_data = @wiki.read(append_ext(path))
+          return @view.view(raw_data, path)
+        elsif @wiki.can_create?(append_ext(path))
           redirect to(URI.encode("/#{path}/edit"))
         else
           halt(403, cannot_create(path))
         end
       else
-        redirect to(URI.encode("/#{path}/")) if wiki.dir?(path)
-        halt(404, not_exist(path)) unless wiki.exist?(path)
+        redirect to(URI.encode("/#{path}/")) if @wiki.dir?(path)
+        halt(404, not_exist(path)) unless @wiki.exist?(path)
         guess_mime(path)
-        return wiki.read(path)
+        return @wiki.read(path)
       end
     end
 
     post '/*/!commit' do |path|
-      wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(path)) unless valid_path?(path)
       raw_data_from_web = NKF.nkf("-Luw", params[:data])
       commit_message = params[:commit_message]
       oid_from_web = params[:oid]
-      oid_from_git = wiki.oid(append_ext(path))
+      oid_from_git = @wiki.oid(append_ext(path))
       is_notify = params[:irc_notification] != "dont_notify"
 
       if oid_from_web == oid_from_git
-        wiki.write(append_ext(path), raw_data_from_web)
-        wiki.commit(remote_user(), remote_user_mail(), commit_message)
+        @wiki.write(append_ext(path), raw_data_from_web)
+        @wiki.commit(remote_user(), remote_user_mail(), commit_message)
         irc_notify(path, remote_user(), commit_message) if is_notify && settings.irc[:enable]
         redirect to(URI.encode("/#{path}"))
       else
-        raw_data_old = wiki.read_from_oid(oid_from_web)
-        raw_data_from_git = wiki.read(append_ext(path))
+        raw_data_old = @wiki.read_from_oid(oid_from_web)
+        raw_data_from_git = @wiki.read(append_ext(path))
         raw_data_merged, is_success = merge(raw_data_from_web, raw_data_old, raw_data_from_git)
         if is_success
-          wiki.write(append_ext(path), raw_data_merged)
-          wiki.commit(remote_user(), remote_user_mail(), commit_message)
+          @wiki.write(append_ext(path), raw_data_merged)
+          @wiki.commit(remote_user(), remote_user_mail(), commit_message)
           irc_notify(path, remote_user(), commit_message) if is_notify && settings.irc[:enable]
           redirect to(URI.encode("/#{path}"))
         else
-          return conflict(raw_data_merged, path, oid_from_git)
+          return @view.conflict(raw_data_merged, path, oid_from_git)
         end
       end
     end
 
     post '/*/!preview' do |path|
-      wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(path)) unless valid_path?(path)
       raw_data = params[:data]
       oid = params[:oid]
-      return preview(raw_data, oid, path, wiki)
+      return @view.preview(raw_data, oid, path)
     end
 
     post '/!search' do
-      wiki = Git.new(settings.git_repo_path)
       keyword = params[:keyword]
       halt(403, empty_search()) if keyword.empty?
-      result = wiki.search(keyword)
-      return search(keyword, result)
+      result = @wiki.search(keyword)
+      return @view.search(keyword, result)
     end
 
     private

@@ -1,6 +1,6 @@
 git_repo_path: "/path/to/bare_repository.git"
 domain: "example.com"
-front_page: "Front_Page"
+frontpage: "Front_Page"
 wikiname: "rubwiki"
 irc:
   enable: false
