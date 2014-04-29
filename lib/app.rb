@@ -44,15 +44,15 @@ module RubWiki
     end
 
     get '/*/!history' do |path|
-      halt(403, invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.invalid_path(path)) unless valid_path?(path)
       commits = @wiki.history(File.extname(path).empty? ? append_ext(path) : path)
       return @view.history(commits, path)
     end
 
     get '/*/!revision/*' do |path, revision|
-      halt(403, invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.invalid_path(path)) unless valid_path?(path)
       raw_data = @wiki.read_from_oid(revision)
-      halt(404, invalid_revision(revision)) unless raw_data
+      halt(404, @view.invalid_revision(revision)) unless raw_data
       if File.extname(path).empty?
         return @view.revision(raw_data, path, revision)
       else
@@ -62,57 +62,57 @@ module RubWiki
     end
 
     get '/*/!diff/*/*' do |path, oid1, oid2|
-      halt(403, invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.invalid_path(path)) unless valid_path?(path)
       diff = @wiki.diff(oid1, oid2)
-      halt(404, invalid_diff(oid1, oid2)) unless diff
+      halt(404, @view.invalid_diff(oid1, oid2)) unless diff
       return @view.diff(diff, path, oid1, oid2)
     end
 
     get '/*/!edit' do |path|
-      halt(403, invalid_path(path)) unless valid_path?(path)
-      halt(403, cannot_edit(path)) unless File.extname(path).empty?
+      halt(403, @view.invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.cannot_edit(path)) unless File.extname(path).empty?
       if @wiki.exist?(append_ext(path))
-        halt(403, exist_dir(append_ext(path))) unless @wiki.file?(append_ext(path))
+        halt(403, @view.exist_dir(append_ext(path))) unless @wiki.file?(append_ext(path))
         oid = @wiki.oid(append_ext(path))
         raw_data = @wiki.read(append_ext(path))
       elsif @wiki.can_create?(append_ext(path))
         oid = ""
         raw_data = ""
       else
-        halt(403, cannot_create(path))
+        halt(403, @view.cannot_create(path))
       end
       return @view.edit(raw_data, oid, path)
     end
 
     get '/*/' do |dir|
-      halt(403, invalid_path(dir)) unless valid_path?(dir)
-      halt(404, not_exist_dir(dir)) unless @wiki.dir?(dir)
+      halt(403, @view.invalid_path(dir)) unless valid_path?(dir)
+      halt(404, @view.not_exist_dir(dir)) unless @wiki.dir?(dir)
       list = @wiki.ls(dir)
       return @view.list(list, dir)
     end
 
     get '/*' do |path|
-      halt(403, invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.invalid_path(path)) unless valid_path?(path)
       if File.extname(path).empty?
         if @wiki.exist?(append_ext(path))
-          halt(403, exist_dir(append_ext(path))) if @wiki.dir?(append_ext(path))
+          halt(403, @view.exist_dir(append_ext(path))) if @wiki.dir?(append_ext(path))
           raw_data = @wiki.read(append_ext(path))
           return @view.view(raw_data, path)
         elsif @wiki.can_create?(append_ext(path))
           redirect to(URI.encode("/#{path}/!edit"))
         else
-          halt(403, cannot_create(path))
+          halt(403, @view.cannot_create(path))
         end
       else
         redirect to(URI.encode("/#{path}/")) if @wiki.dir?(path)
-        halt(404, not_exist(path)) unless @wiki.exist?(path)
+        halt(404, @view.not_exist(path)) unless @wiki.exist?(path)
         guess_mime(path)
         return @wiki.read(path)
       end
     end
 
     post '/*/!commit' do |path|
-      halt(403, invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.invalid_path(path)) unless valid_path?(path)
       raw_data_from_web = NKF.nkf("-Luw", params[:data])
       commit_message = params[:commit_message]
       oid_from_web = params[:oid]
@@ -140,7 +140,7 @@ module RubWiki
     end
 
     post '/*/!preview' do |path|
-      halt(403, invalid_path(path)) unless valid_path?(path)
+      halt(403, @view.invalid_path(path)) unless valid_path?(path)
       raw_data = params[:data]
       oid = params[:oid]
       return @view.preview(raw_data, oid, path)
@@ -148,7 +148,7 @@ module RubWiki
 
     post '/!search' do
       keyword = params[:keyword]
-      halt(403, empty_search()) if keyword.empty?
+      halt(403, @view.empty_search()) if keyword.empty?
       result = @wiki.search(keyword)
       return @view.search(keyword, result)
     end
@@ -156,9 +156,7 @@ module RubWiki
     private
 
     def valid_path?(path)
-      names = path.split("/")
-      forbidden_words = ["!edit", "!preview", "!commit", "!diff", "!search", "!history", "!revision"]
-      return (names & forbidden_words).empty?
+      return !path.include?("/!")
     end
 
     def remote_user
