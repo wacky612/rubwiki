@@ -2,19 +2,19 @@
 !!! 5
 %html{ html_attrs('ja') }
   %head
-    %link{ :rel => "stylesheet", :type => "text/css", :href => "#{baseurl}css/style.css" }
-    %script{ :type => "text/javascript", :src => "#{baseurl}js/post.js" }
-    %script{ :type => "text/javascript", :src => "#{baseurl}js/jquery-2.1.0.min.js" }
-    %script{ :type => "text/javascript", :src => "#{baseurl}js/flexie.min.js" }
+    %link{ rel: "stylesheet", type: "text/css", href: "#{baseurl}css/style.css" }
+    %script{ type: "text/javascript", src: "#{baseurl}js/post.js" }
+    %script{ type: "text/javascript", src: "#{baseurl}js/jquery-2.1.0.min.js" }
+    %script{ type: "text/javascript", src: "#{baseurl}js/flexie.min.js" }
     %title= settings.wikiname
   %body
     %nav
-      %a{ :href => "/" }<
+      %a{ href: "/" }<
         %img{ src: "#{baseurl}img/logo.png" }
       !~ nav
-      %form{ :name => "search" }
+      %form{ name: "search" }
         - action = "#{baseurl}!search"
-        %input.text{ :type => "text", :name => "keyword", :onkeydown => "if(event.keyCode == 13){post('search', '#{action}');}" }
+        %input.text{ type: "text", name: "keyword", onkeydown: "if(event.keyCode == 13){post('search', '#{action}');}" }
         %br
-        %input{ :type => "button", :value =>"検索", :onclick => "return post('search', '#{action}');" }
+        %input{ type: "button", value: "検索", onclick: "return post('search', '#{action}');" }
     %article!~ article

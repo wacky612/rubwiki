@@ -5,14 +5,12 @@
     %li<
       #{commits[i][:time].strftime("%y/%m/%d %T")} #{commits[i][:author]}
       - if commits[i][:oid]
-        %a{ :href => "!revision/#{commits[i][:oid]}" }<
-          :escaped
-            #{commits[i][:message].chomp}
+        %a{ href: "!revision/#{commits[i][:oid]}" }<
+          #{commits[i][:message].chomp}
         - if i != commits.length - 1
           [
-          %a{ :href => "!diff/#{commits[i][:oid]}/#{commits[i+1][:oid]}" }<
+          %a{ href: "!diff/#{commits[i][:oid]}/#{commits[i+1][:oid]}" }<
             diff
           ]
       - else
-        :escaped
-          #{commits[i][:message].chomp} (deleted)
+        #{commits[i][:message].chomp} (deleted)
