@@ -99,7 +99,7 @@ module RubWiki
           raw_data = @wiki.read(append_ext(path))
           return @view.view(raw_data, path)
         elsif @wiki.can_create?(append_ext(path))
-          redirect to(URI.encode("/#{path}/edit"))
+          redirect to(URI.encode("/#{path}/!edit"))
         else
           halt(403, cannot_create(path))
         end
