@@ -48,7 +48,7 @@ module RubWiki
     helpers View
 
     get '/css/style.css' do
-      scss :style, :style => :expanded
+      scss :style, :style => :compressed
     end
 
     get '/' do
