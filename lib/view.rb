@@ -1,5 +1,5 @@
-require 'cgi'
 require 'haml'
+require 'sanitize'
 require_relative 'kramdown_custom'
 
 module RubWiki
@@ -119,7 +119,7 @@ module RubWiki
     def markdown(data)
       options = { wiki: @wiki, baseurl: @baseurl }
       html = Kramdown::Document.new(data, options).to_html_custom
-      return CGI.escapeElement(html, "script")
+      return Sanitize.clean(html, Sanitize::Config::RELAXED)
     end
 
     def haml(template, locals = {})
