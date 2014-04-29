@@ -1,14 +1,14 @@
 %ul
   %li<
-    %a{ href: "#{baseurl}#{settings.frontpage}" }Front Page
+    %a{ href: "#{baseurl}/#{settings.frontpage}" }Front Page
   %li<
-    %a{ href: "#{baseurl}" }< All
+    %a{ href: "#{baseurl}/" }< All
   - if path
     %li<
-      %a{ href: "#{baseurl}#{path}/!edit" }< Edit
+      %a{ href: "#{baseurl}/#{path}/!edit" }< Edit
     %li<
-      %a{ href: "#{baseurl}#{path}/!history" }< History
+      %a{ href: "#{baseurl}/#{path}/!history" }< History
     - if File.extname(path).empty?
       %li<
-        %a{ href: "#{baseurl}#{path}.md" }< Raw
+        %a{ href: "#{baseurl}/#{path}.md" }< Raw
 

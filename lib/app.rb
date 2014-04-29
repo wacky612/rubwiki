@@ -31,7 +31,7 @@ module RubWiki
 
     before do
       @wiki = Git.new(settings.git_repo_path)
-      @view = View.new(@wiki, url("/"), settings)
+      @view = View.new(@wiki, url("/")[0..-2], settings)
     end
 
     get '/css/style.css' do

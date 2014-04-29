@@ -4,4 +4,4 @@
   - result.each do |path|
     - if File.extname(path) == ".md"
       %li<
-        %a{ href: "#{baseurl}#{path[0...-3]}" }< #{path[0...-3]}
+        %a{ href: "#{baseurl}/#{path[0...-3]}" }< #{path[0...-3]}
