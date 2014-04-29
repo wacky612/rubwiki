@@ -124,7 +124,7 @@ module RubWiki
       data = File.read(File.expand_path("#{File.dirname(__FILE__)}/../views/#{template.to_s}.haml"))
       locals[:settings] = @settings
       locals[:baseurl] = @baseurl
-      return Haml::Engine.new(data).render(Object.new, locals)
+      return Haml::Engine.new(data, escape_html: true).render(Object.new, locals)
     end
   end
 end
