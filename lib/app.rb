@@ -5,8 +5,6 @@ require 'sass'
 require 'socket'
 require 'mime-types'
 
-require 'string/scrub'
-
 require 'sinatra/base'
 require 'sinatra/reloader'
 require 'sinatra/config_file'
