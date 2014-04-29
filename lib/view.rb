@@ -1,3 +1,4 @@
+require 'cgi'
 require 'haml'
 require_relative 'kramdown_custom'
 
@@ -117,7 +118,8 @@ module RubWiki
 
     def markdown(data)
       options = { wiki: @wiki, baseurl: @baseurl }
-      return Kramdown::Document.new(data, options).to_html_custom
+      escaped_data = CGI.escapeElement(data, "script")
+      return Kramdown::Document.new(escaped_data, options).to_html_custom
     end
 
     def haml(template, locals = {})
