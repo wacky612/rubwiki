@@ -121,19 +121,13 @@ module RubWiki
       is_notify = params[:irc_notification] != "dont_notify"
 
       if oid_from_web == oid_from_git
-        @wiki.write(append_ext(path), raw_data_from_web)
-        @wiki.commit(remote_user(), remote_user_mail(), commit_message)
-        irc_notify(path, remote_user(), commit_message) if is_notify && settings.irc[:enable]
-        redirect to(URI.encode("/#{path}"))
+        commit(path, raw_data_from_web, commit_message, is_notify)
       else
         raw_data_old = @wiki.read_from_oid(oid_from_web)
         raw_data_from_git = @wiki.read(append_ext(path))
         raw_data_merged, is_success = merge(raw_data_from_web, raw_data_old, raw_data_from_git)
         if is_success
-          @wiki.write(append_ext(path), raw_data_merged)
-          @wiki.commit(remote_user(), remote_user_mail(), commit_message)
-          irc_notify(path, remote_user(), commit_message) if is_notify && settings.irc[:enable]
-          redirect to(URI.encode("/#{path}"))
+          commit(path, raw_data_merged, commit_message, is_notify)
         else
           return @view.conflict(raw_data_merged, path, oid_from_git)
         end
@@ -195,6 +189,13 @@ module RubWiki
         File.delete("git")
       end
       return raw_data_merged, ($? == 0)
+    end
+
+    def commit(path, raw_data, commit_message, is_notify)
+      @wiki.write(append_ext(path), raw_data)
+      @wiki.commit(remote_user(), remote_user_mail(), commit_message)
+      irc_notify(path, remote_user(), commit_message) if is_notify && settings.irc[:enable]
+      redirect to(URI.encode("/#{path}"))
     end
 
     def append_ext(path)
