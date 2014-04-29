@@ -12,7 +12,7 @@
         %img{ src: url("/img/logo.png") }
       ~ nav
       %form{ :name => "search" }
-        - action = url("/search")
+        - action = url("/!search")
         %input.text{ :type => "text", :name => "keyword", :onkeydown => "if(event.keyCode == 13){post('search', '#{action}');}" }
         %br
         %input{ :type => "button", :value =>"検索", :onclick => "return post('search', '#{action}');" }

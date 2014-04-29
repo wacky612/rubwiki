@@ -57,14 +57,14 @@ module RubWiki
       return list(list)
     end
 
-    get '/*/history' do |path|
+    get '/*/!history' do |path|
       wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(path)) unless valid_path?(path)
       commits = wiki.history(File.extname(path).empty? ? append_ext(path) : path)
       return history(commits, path)
     end
 
-    get '/*/revision/*' do |path, revision|
+    get '/*/!revision/*' do |path, revision|
       wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(path)) unless valid_path?(path)
       raw_data = wiki.read_from_oid(revision)
@@ -77,7 +77,7 @@ module RubWiki
       end
     end
 
-    get '/*/diff/*/*' do |path, oid1, oid2|
+    get '/*/!diff/*/*' do |path, oid1, oid2|
       wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(path)) unless valid_path?(path)
       diff = wiki.diff(oid1, oid2)
@@ -85,7 +85,7 @@ module RubWiki
       return diff(diff, path, oid1, oid2)
     end
 
-    get '/*/edit' do |path|
+    get '/*/!edit' do |path|
       wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(path)) unless valid_path?(path)
       halt(403, cannot_edit(path)) unless File.extname(path).empty?
@@ -131,7 +131,7 @@ module RubWiki
       end
     end
 
-    post '/*/commit' do |path|
+    post '/*/!commit' do |path|
       wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(path)) unless valid_path?(path)
       raw_data_from_web = NKF.nkf("-Luw", params[:data])
@@ -160,7 +160,7 @@ module RubWiki
       end
     end
 
-    post '/*/preview' do |path|
+    post '/*/!preview' do |path|
       wiki = Git.new(settings.git_repo_path)
       halt(403, invalid_path(path)) unless valid_path?(path)
       raw_data = params[:data]
@@ -168,7 +168,7 @@ module RubWiki
       return preview(raw_data, oid, path, wiki)
     end
 
-    post '/search' do
+    post '/!search' do
       wiki = Git.new(settings.git_repo_path)
       keyword = params[:keyword]
       halt(403, empty_search()) if keyword.empty?
@@ -180,7 +180,7 @@ module RubWiki
 
     def valid_path?(path)
       names = path.split("/")
-      forbidden_words = ["edit", "preview", "commit", "diff", "search", "history", "revision"]
+      forbidden_words = ["!edit", "!preview", "!commit", "!diff", "!search", "!history", "!revision"]
       return (names & forbidden_words).empty?
     end
 
