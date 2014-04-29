@@ -15,10 +15,12 @@ require_relative 'view'
 module RubWiki
   class App < Sinatra::Base
 
-    register Sinatra::Reloader
-    also_reload "#{File.dirname(__FILE__)}/git.rb"
-    also_reload "#{File.dirname(__FILE__)}/view.rb"
-    also_reload "#{File.dirname(__FILE__)}/kramdown_patch.rb"
+    configure :development do
+      register Sinatra::Reloader
+      also_reload "#{File.dirname(__FILE__)}/git.rb"
+      also_reload "#{File.dirname(__FILE__)}/view.rb"
+      also_reload "#{File.dirname(__FILE__)}/kramdown_custom.rb"
+    end
 
     register Sinatra::ConfigFile
     config_file "#{File.dirname(__FILE__)}/../config/config.yml"
