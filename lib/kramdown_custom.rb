@@ -9,7 +9,7 @@ class Kramdown::Converter::HtmlCustom < Kramdown::Converter::Html
       attr['href'] = @options[:wiki].search_file(res)
     end
     if attr['href'].start_with?('/')
-      attr['href'] = @options[:baseurl] + attr['href']
+      attr['href'] = @options[:baseurl][0..-2] + attr['href']
     end
     format_as_span_html(el.type, attr, res)
   end
