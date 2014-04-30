@@ -39,6 +39,10 @@ module RubWiki
       scss :style, :style => :compressed
     end
 
+    get '' do
+      redirect to('/')
+    end
+
     get '/' do
       list = @wiki.ls()
       return @view.list(list)
