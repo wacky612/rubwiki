@@ -4,7 +4,7 @@
   %br
   Commit Message:
   %br
-  %input.text{ type: "text", name: "commit_message", onkeydown: "if(event.keyCode == 13){post('edit', 'commit');}" }
+  %input.text{ type: "text", name: "commit_message", onkeydown: "if(event.keyCode == 13){post('edit', '!commit');}" }
   %br
   %input{ type: "hidden", name: "oid", value: "#{oid}" }
   %input{ type: "button", value: "更新", onclick: "return post('edit', '!commit');" }
