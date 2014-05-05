@@ -129,10 +129,28 @@ article {
                 padding: 4px;
                 background-color: lavender;
             }
+            th.center {
+                text-align: center;
+            }
+            th.right {
+                text-align: right;
+            }
+            th.legt {
+                text-align: left;
+            }
             td {
                 @include border;
                 padding: 4px;
                 background-color: ghostwhite;
+            }
+            td.center {
+                text-align: center;
+            }
+            td.right {
+                text-align: right;
+            }
+            td.legt {
+                text-align: left;
             }
         }
     }

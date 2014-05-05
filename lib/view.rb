@@ -120,8 +120,8 @@ module RubWiki
       options = { wiki: @wiki, baseurl: @baseurl }
       html = Kramdown::Document.new(data, options).to_html_custom
       custom = Sanitize::Config::RELAXED
-      custom[:attributes]["td"] << "align"
-      custom[:attributes]["th"] << "align"
+      custom[:attributes]["td"] << "class"
+      custom[:attributes]["th"] << "class"
       return Sanitize.clean(html, custom)
     end
 
