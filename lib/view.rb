@@ -119,7 +119,10 @@ module RubWiki
     def markdown(data)
       options = { wiki: @wiki, baseurl: @baseurl }
       html = Kramdown::Document.new(data, options).to_html_custom
-      return Sanitize.clean(html, Sanitize::Config::RELAXED)
+      custom = Sanitize::Config::RELAXED
+      custom[:attributes]["td"] << "align"
+      custom[:attributes]["th"] << "align"
+      return Sanitize.clean(html, custom)
     end
 
     def haml(template, locals = {})

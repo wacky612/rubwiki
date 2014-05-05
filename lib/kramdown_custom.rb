@@ -13,4 +13,16 @@ class Kramdown::Converter::HtmlCustom < Kramdown::Converter::Html
     end
     format_as_span_html(el.type, attr, res)
   end
+
+  def convert_td(el, indent)
+    res = inner(el, indent)
+    type = (@stack[-2].type == :thead ? :th : :td)
+    attr = el.attr
+    alignment = @stack[-3].options[:alignment][@stack.last.children.index(el)]
+    if alignment != :default
+      attr = el.attr.dup
+      attr['align'] = (attr.has_key?('style') ? "#{attr['style']}; ": '') << "#{alignment}"
+    end
+    format_as_block_html(type, attr, res.empty? ? entity_to_str(ENTITY_NBSP) : res, indent)
+  end
 end
