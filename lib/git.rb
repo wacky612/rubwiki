@@ -88,7 +88,7 @@ module RubWiki
       walker.push(@repo.head.target)
       commits = []
       walker.each do |commit|
-        if commit.parents.size >= 1 && commit.diff(paths: [path]).size > 0
+        if commit.diff(paths: [path]).size > 0
           _commit = {}
           _commit[:author] = commit.author[:name]
           _commit[:message] = commit.message
