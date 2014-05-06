@@ -112,6 +112,7 @@ module RubWiki
 
     def write(path, data)
       blob_oid = @repo.write(data, :blob)
+      chmod(blob_oid)
       @tree_oid = update_tree(@tree_oid, path, blob_oid)
     end
 
@@ -166,7 +167,13 @@ module RubWiki
       else
         builder.insert({ :name => path, :oid => blob_oid, :filemode => 33188, :type => :blob })
       end
-      return builder.write(@repo)
+      oid = builder.write(@repo)
+      chmod(oid)
+      return oid
+    end
+
+    def chmod(oid)
+      File.chmod(02664, "#{@repo.path}/objects/#{oid[0, 2]}")
     end
 
     def get_oid(path, tree_oid = nil)
