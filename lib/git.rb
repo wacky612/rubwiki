@@ -174,7 +174,7 @@ module RubWiki
 
     def chmod(oid)
       path = "#{@repo.path}objects/#{oid[0, 2]}"
-      if File.stat(path).owned?
+      if File.stat(path).uid == Process::Sys.geteuid
         File.chmod(02775, path)
       end
     end
