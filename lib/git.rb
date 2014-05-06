@@ -175,7 +175,7 @@ module RubWiki
     def chmod(oid)
       path = "#{@repo.path}objects/#{oid[0, 2]}"
       if File.stat(path).owned?
-        File.chmod(02664, path)
+        File.chmod(02775, path)
       end
     end
 
