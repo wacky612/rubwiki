@@ -173,7 +173,7 @@ module RubWiki
     end
 
     def chmod(oid)
-      File.chmod(02664, "#{@repo.path}/objects/#{oid[0, 2]}")
+      File.chmod(02664, "#{@repo.path}objects/#{oid[0, 2]}")
     end
 
     def get_oid(path, tree_oid = nil)
