@@ -4,6 +4,7 @@ require 'nkf'
 require 'sass'
 require 'socket'
 require 'mime-types'
+require 'carrier-pigeon'
 
 require 'sinatra/base'
 require 'sinatra/reloader'
@@ -208,55 +209,20 @@ module RubWiki
     end
 
     def irc_notify(path, author, commit_message)
-      Thread.new do
-        th = irc_notify_thread(path, author, commit_message)
-        sleep 10
-        th.kill
-      end
+      wikiname = settings.wikiname
+      url = url("/#{URI.encode(path)}")
+      channel = settings.irc[:channel]
+
+      pigeon = CarrierPigeon.new(:host => settings.irc[:server],
+                                 :port => settings.irc[:port],
+                                 :nick => settings.irc[:nick],
+                                 :password => settings.irc[:pass],
+                                 :channel => channel,
+                                 :join => true)
+      pigeon.message(channel, "[#{wikiname}] #{path} is updated by #{author}")
+      pigeon.message(channel, "[#{wikiname}] #{url}")
+      pigeon.message(channel, "[#{wikiname}] Commit Message: #{commit_message}")
+      pigeon.die
     end
-
-    def irc_notify_thread(path, author, commit_message)
-      return Thread.new do
-        ponger = nil
-        pong_flag = false
-        join_flag = false
-        begin
-          TCPSocket.open(settings.irc[:server], settings.irc[:port]) do |socket|
-            wikiname = settings.wikiname
-            channel = settings.irc[:channel]
-            url = url("/#{URI.encode(path)}")
-
-            ponger = Thread.new do
-              while string = socket.gets
-                if string =~ /^PING (:.*)$/
-                  socket.puts("PONG #{$1}")
-                  pong_flag = true
-                elsif string =~ /JOIN :#{channel}/
-                  join_flag = true
-                end
-              end
-            end
-
-            socket.puts("NICK #{settings.irc[:nick]}")
-            while !pong_flag
-              sleep 1
-            end
-            socket.puts("USER #{settings.irc[:user]}")
-            socket.puts("PASS #{settings.irc[:pass]}")
-            socket.puts("JOIN #{channel}")
-            while !join_flag
-              sleep 1
-            end
-            socket.puts("PRIVMSG #{channel} :[#{wikiname}] #{path} is updated by #{author}")
-            socket.puts("PRIVMSG #{channel} :[#{wikiname}] #{url}")
-            socket.puts("PRIVMSG #{channel} :[#{wikiname}] Commit Message: #{commit_message}")
-            socket.puts("QUIT")
-          end
-        ensure
-          ponger.kill
-        end
-      end
-    end
-
   end
 end

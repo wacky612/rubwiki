@@ -7,6 +7,5 @@ irc:
   server: "example.com"
   port: 6666
   nick: "nick"
-  user: "nick 0 * :nick"
   pass: "password"
   channel: "#rubwiki"
