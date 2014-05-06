@@ -126,6 +126,7 @@ module RubWiki
       options[:parents] = @repo.empty? ? [] : [ @repo.head.target ].compact
       options[:update_ref] = 'HEAD'
       Rugged::Commit.create(@repo, options)
+      chmod(@tree_oid)
     end
 
     def search(keyword)
