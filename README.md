@@ -18,6 +18,5 @@ bundle exec rackup
 ~~~
 
 - You have to make at least one commit in your
-  git repository.
-
+  git repository before you use this application.
 - You can deploy this application on passenger.
