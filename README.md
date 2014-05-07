@@ -5,7 +5,7 @@
 - support for URL which contain UTF-8 character
 - IRC notification
 
-## install
+## deployment
 
 ~~~
 git init --bare --shared /path/to/wikidata.git
@@ -16,3 +16,8 @@ nano config.yml
 bundle install --path=vendor/bundle
 bundle exec rackup
 ~~~
+
+- You have to make at least one commit in your
+  git repository.
+
+- You can deploy this application on passenger.
