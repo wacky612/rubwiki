@@ -219,8 +219,7 @@ module RubWiki
                                  :password => settings.irc[:pass],
                                  :channel => channel,
                                  :join => true)
-      pigeon.message(channel, "[#{wikiname}] #{path} is updated by #{author}")
-      pigeon.message(channel, "[#{wikiname}] #{url}")
+      pigeon.message(channel, "[#{wikiname}] #{path} #{url} updated by #{author}")
       pigeon.message(channel, "[#{wikiname}] Commit Message: #{commit_message}")
       pigeon.die
     end
