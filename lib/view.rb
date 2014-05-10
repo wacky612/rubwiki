@@ -36,15 +36,15 @@ module RubWiki
       return page(nav(), article)
     end
 
-    def preview(raw_data, oid, path)
-      form = haml(:form, { raw_data: raw_data, oid: oid })
+    def preview(raw_data, oid, path, commit_message, is_notify)
+      form = haml(:form, { raw_data: raw_data, oid: oid, commit_message: commit_message, is_checked: !is_notify })
       preview = markdown(raw_data)
       article = haml(:preview, { form: form, preview: preview, path: path })
       return page(nav(), article)
     end
 
     def edit(raw_data, oid, path)
-      form = haml(:form, { raw_data: raw_data, oid: oid })
+      form = haml(:form, { raw_data: raw_data, oid: oid, commit_message: "", is_checked: false })
       article = haml(:edit, { form: form, path: path })
       return page(nav(), article)
     end

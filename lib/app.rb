@@ -144,7 +144,9 @@ module RubWiki
       halt(403, @view.invalid_path(path)) if invalid_path?(path)
       raw_data = params[:data]
       oid = params[:oid]
-      return @view.preview(raw_data, oid, path)
+      commit_message = params[:commit_message]
+      is_notify = params[:irc_notification] != "dont_notify"
+      return @view.preview(raw_data, oid, path, commit_message, is_notify)
     end
 
     post '/!search' do
