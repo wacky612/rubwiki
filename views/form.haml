@@ -2,13 +2,15 @@
 %form{ name: "edit" }
   %textarea{ name: "data" } #{raw_data}
   %br
-  Commit Message:
-  %br
-  %input.text{ type: "text", name: "commit_message", onkeydown: "if(event.keyCode == 13){post('edit', '!commit');}", value: "#{commit_message}" }
+  %label<
+    Commit Message:
+    %br
+    %input.text{ type: "text", name: "commit_message", onkeydown: "if(event.keyCode == 13){post('edit', '!commit');}", value: "#{commit_message}" }
   %br
   %input{ type: "hidden", name: "oid", value: "#{oid}" }
   %input{ type: "button", value: "更新", onclick: "return post('edit', '!commit');" }
   %input{ type: "button", value: "プレビュー", onclick: "return post('edit', '!preview');" }
   - if settings.irc[:enable]
-    %input{ type: "checkbox", name: "irc_notification", value: "dont_notify", checked: is_checked }
-    IRC に通知しない
+    %label<
+      %input{ type: "checkbox", name: "irc_notification", value: "dont_notify", checked: is_checked }
+      IRC に通知しない
