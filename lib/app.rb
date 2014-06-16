@@ -126,6 +126,10 @@ module RubWiki
       oid_from_git = @wiki.oid(append_ext(path))
       is_notify = params[:irc_notification] != "dont_notify"
 
+      if commit_message.empty?
+        return @view.edit(raw_data_from_web, oid_from_web, path, is_notify, true)
+      end
+
       if oid_from_web == oid_from_git
         commit(path, raw_data_from_web, commit_message, is_notify)
       else

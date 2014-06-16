@@ -5,6 +5,8 @@
   %label<
     Commit Message:
     %br
+    - if no_commit_message_error
+      %strong コミットメッセージを入力してください。
     %input.text{ type: "text", name: "commit_message", onkeydown: "if(event.keyCode == 13){post('edit', '!commit');}", value: "#{commit_message}" }
   %br
   %input{ type: "hidden", name: "oid", value: "#{oid}" }

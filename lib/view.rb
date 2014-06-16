@@ -43,8 +43,8 @@ module RubWiki
       return page(nav(), article)
     end
 
-    def edit(raw_data, oid, path)
-      form = haml(:form, { raw_data: raw_data, oid: oid, commit_message: "", is_checked: false })
+    def edit(raw_data, oid, path, is_notify = true, no_commit_message_error = false)
+      form = haml(:form, { raw_data: raw_data, oid: oid, commit_message: "", is_checked: !is_notify, no_commit_message_error: no_commit_message_error })
       article = haml(:edit, { form: form, path: path })
       return page(nav(), article)
     end
