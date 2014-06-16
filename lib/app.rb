@@ -5,6 +5,7 @@ require 'sass'
 require 'socket'
 require 'mime-types'
 require 'carrier-pigeon'
+require 'tmpdir'
 
 require 'sinatra/base'
 require 'sinatra/reloader'
@@ -189,16 +190,15 @@ module RubWiki
 
     def merge(raw_data_from_web, raw_data_old, raw_data_from_git)
       raw_data_merged = nil
-      Dir.chdir("/tmp") do
-        File.write("web", raw_data_from_web)
-        File.write("old", raw_data_old)
-        File.write("git", raw_data_from_git)
-        IO.popen("diff3 -mE web old git", "r", :encoding => Encoding::UTF_8) do |io|
-          raw_data_merged = io.read
-        end
-        File.delete("web")
-        File.delete("old")
-        File.delete("git")
+      Dir.mktmpdir do |dir|
+        Dir.chdir(dir) do
+          File.write("web", raw_data_from_web)
+          File.write("old", raw_data_old)
+          File.write("git", raw_data_from_git)
+          IO.popen("diff3 -mE web old git", "r", :encoding => Encoding::UTF_8) do |io|
+            raw_data_merged = io.read
+          end
+       end
       end
       return raw_data_merged, ($? == 0)
     end
