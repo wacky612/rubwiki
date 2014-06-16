@@ -14,9 +14,8 @@
       %a{ href: "/" }<
         %img{ src: "#{baseurl}/img/logo.png" }
       !~ nav
-      %form{ name: "search" }
-        - action = "#{baseurl}/!search"
-        %input.text{ type: "text", name: "keyword", onkeydown: "if(event.keyCode == 13){post('search', '#{action}');}" }
+      %form{ name: "search", method: "POST", action: "#{baseurl}/!search" }
+        %input.text{ type: "text", name: "keyword" }
         %br
-        %input{ type: "button", value: "検索", onclick: "return post('search', '#{action}');" }
+        %input{ type: "submit", value: "検索" }
     %article!~ article
