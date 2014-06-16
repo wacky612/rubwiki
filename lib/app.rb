@@ -102,7 +102,7 @@ module RubWiki
       if File.extname(path).empty?
         if @wiki.exist?(append_ext(path))
           halt(403, @view.exist_dir(append_ext(path))) if @wiki.dir?(append_ext(path))
-          etag @wiki.oid(append_ext(path))
+#          etag @wiki.oid(append_ext(path))
           raw_data = @wiki.read(append_ext(path))
           return @view.view(raw_data, path)
         elsif @wiki.can_create?(append_ext(path))
