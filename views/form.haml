@@ -1,5 +1,5 @@
 -# coding: utf-8
-%form{ name: "edit" }
+%form{ name: "edit", method: "POST", action: "!commit" }
   %textarea{ name: "data" } #{raw_data}
   %br
   %label<
@@ -7,10 +7,10 @@
     %br
     - if no_commit_message_error
       %strong コミットメッセージを入力してください。
-    %input.text{ type: "text", name: "commit_message", onkeydown: "if(event.keyCode == 13){post('edit', '!commit');}", value: "#{commit_message}" }
+    %input.text{ type: "text", name: "commit_message", value: "#{commit_message}" }
   %br
   %input{ type: "hidden", name: "oid", value: "#{oid}" }
-  %input{ type: "button", value: "更新", onclick: "return post('edit', '!commit');" }
+  %input{ type: "submit", value: "更新" }
   %input{ type: "button", value: "プレビュー", onclick: "return post('edit', '!preview');" }
   - if settings.irc[:enable]
     %label<
