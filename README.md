@@ -12,7 +12,7 @@ git init --bare --shared /path/to/wikidata.git
 git clone https://github.com/wacky612/rubwiki
 cd rubwiki
 cp config/config.yml.example config/config.yml
-nano config.yml
+nano config/config.yml
 bundle install --path=vendor/bundle
 bundle exec rackup
 ~~~
